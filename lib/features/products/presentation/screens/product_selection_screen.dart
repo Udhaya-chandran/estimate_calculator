@@ -29,9 +29,11 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
     final categoryAllProducts = ref.watch(productsByCategoryProvider(selectedCategory.id));
     final activeCount = ref.watch(estimateCountProvider);
     final activeSubtotal = ref.watch(estimateSubtotalProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth >= 640;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: context.colors.background,
       appBar: AppHeader(
         title: selectedCategory.name,
         subtitle: '${categoryAllProducts.length} items available',
@@ -40,12 +42,12 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
         actions: [
           if (activeCount > 0)
             Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: const EdgeInsets.only(right: 4.0),
               child: IconButton(
                 icon: Badge(
                   label: Text('$activeCount'),
                   backgroundColor: AppColors.primaryRed,
-                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primaryText),
+                  child: Icon(Icons.shopping_cart_outlined, color: context.colors.primaryText),
                 ),
                 onPressed: () => context.push('/estimate-list'),
               ),
@@ -57,7 +59,7 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
           // 1. Top Category Tabs Bar
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.white,
+              color: context.colors.surface,
               padding: const EdgeInsets.symmetric(vertical: 9),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -76,10 +78,10 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.primaryRed : Colors.white,
+                            color: isSelected ? AppColors.primaryRed : context.colors.cardBackground,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isSelected ? AppColors.primaryRed : const Color(0xFFE5E7EB),
+                              color: isSelected ? AppColors.primaryRed : context.colors.border,
                               width: 1.1,
                             ),
                             boxShadow: isSelected
@@ -92,7 +94,7 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                                   ]
                                 : [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.02),
+                                      color: context.colors.cardShadow,
                                       blurRadius: 3,
                                       offset: const Offset(0, 1),
                                     ),
@@ -104,13 +106,13 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                               Icon(
                                 _getCategoryIcon(cat.id),
                                 size: 16,
-                                color: isSelected ? Colors.white : const Color(0xFF374151),
+                                color: isSelected ? Colors.white : context.colors.primaryText,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 cat.name,
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                                  color: isSelected ? Colors.white : context.colors.primaryText,
                                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12.5,
                                 ),
@@ -126,8 +128,8 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
             ),
           ),
 
-          const SliverToBoxAdapter(
-            child: Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
+          SliverToBoxAdapter(
+            child: Divider(height: 1, thickness: 1, color: context.colors.border),
           ),
 
           // 2. Breadcrumb, Title & Subtitle
@@ -148,28 +150,28 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                             context.go('/dashboard');
                           }
                         },
-                        child: const Text(
+                        child: Text(
                           'All categories',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primaryRed,
+                            color: context.colors.primaryText,
                           ),
                         ),
                       ),
-                      const Text(
+                      Text(
                         '  /  ',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF9CA3AF),
+                          color: context.colors.secondaryText,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                       Text(
                         selectedCategory.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF9CA3AF),
+                          color: context.colors.secondaryText,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -180,10 +182,10 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                   // Category Title
                   Text(
                     selectedCategory.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF111827),
+                      color: context.colors.primaryText,
                       letterSpacing: -0.4,
                     ),
                   ),
@@ -192,9 +194,9 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                   // Category Subtitle & Count
                   Text(
                     '${selectedCategory.subtitle ?? ''} · ${categoryAllProducts.length} products in this sample',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF4B5563),
+                      color: context.colors.secondaryText,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -210,12 +212,12 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.colors.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFE5E7EB), width: 1.1),
+                  border: Border.all(color: context.colors.border, width: 1.1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.025),
+                      color: context.colors.cardShadow,
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -225,12 +227,12 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // FILTER uppercase label
-                    const Text(
+                    Text(
                       'FILTER',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF8A92A6),
+                        color: context.colors.secondaryText,
                         letterSpacing: 1.1,
                       ),
                     ),
@@ -279,7 +281,7 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
             child: SizedBox(height: 12),
           ),
 
-          // 4. Filtered Products List
+          // 4. Filtered Products List / Grid
           if (filteredProducts.isEmpty)
             SliverFillRemaining(
               hasScrollBody: false,
@@ -292,6 +294,28 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
                   onButtonPressed: () {
                     ref.read(selectedSubCategoryProvider.notifier).select(null);
                   },
+                ),
+              ),
+            )
+          else if (isWide)
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: screenWidth >= 1000 ? 3 : 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  mainAxisExtent: 175,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final product = filteredProducts[index];
+                    return ProductCard(
+                      product: product,
+                      onSelect: () => _navigateToCalculator(context, ref, product),
+                    );
+                  },
+                  childCount: filteredProducts.length,
                 ),
               ),
             )
@@ -337,10 +361,10 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5.5),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8A0000) : const Color(0xFFF4F4F6),
+          color: isSelected ? context.colors.activePill : context.colors.pillBg,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? const Color(0xFF8A0000) : const Color(0xFFE5E7EB),
+            color: isSelected ? context.colors.activePill : context.colors.pillBorder,
             width: 1,
           ),
         ),
@@ -350,7 +374,7 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                color: isSelected ? Colors.white : context.colors.primaryText,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 fontSize: 12,
               ),
@@ -359,7 +383,7 @@ class _ProductSelectionScreenState extends ConsumerState<ProductSelectionScreen>
             Text(
               '$count',
               style: TextStyle(
-                color: isSelected ? Colors.white : const Color(0xFF8A0000),
+                color: isSelected ? Colors.white : context.colors.secondaryText,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),

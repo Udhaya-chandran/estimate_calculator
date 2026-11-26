@@ -37,12 +37,12 @@ class RecentEstimateCard extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.lightRed,
+                      color: context.colors.segmentedSelectedBg,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.receipt_long_rounded,
-                      color: AppColors.primaryRed,
+                      color: context.colors.primaryText,
                       size: 18,
                     ),
                   ),
@@ -53,7 +53,7 @@ class RecentEstimateCard extends StatelessWidget {
                       Text(
                         estimate.id,
                         style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.primaryText,
+                          color: context.colors.primaryText,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -89,17 +89,20 @@ class RecentEstimateCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
+                  Text(
                     'Total Amount',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.secondaryText,
+                      color: context.colors.secondaryText,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     CurrencyFormatter.format(estimate.finalAmount),
-                    style: AppTextStyles.priceMedium.copyWith(fontSize: 17),
+                    style: AppTextStyles.priceMedium.copyWith(
+                      fontSize: 17,
+                      color: context.colors.primaryText,
+                    ),
                   ),
                 ],
               ),

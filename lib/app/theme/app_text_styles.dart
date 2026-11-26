@@ -84,14 +84,12 @@ class AppTextStyles {
   static const TextStyle priceHighlight = TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.w800,
-    color: AppColors.primaryRed,
     letterSpacing: -0.5,
   );
 
   static const TextStyle priceMedium = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w700,
-    color: AppColors.primaryRed,
   );
 }
 

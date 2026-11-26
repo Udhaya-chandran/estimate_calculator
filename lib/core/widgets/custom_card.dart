@@ -5,7 +5,7 @@ class CustomCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Color? borderColor;
   final double borderRadius;
   final bool hasShadow;
@@ -15,7 +15,7 @@ class CustomCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
-    this.backgroundColor = AppColors.surface,
+    this.backgroundColor,
     this.borderColor,
     this.borderRadius = 14.0,
     this.hasShadow = true,
@@ -23,21 +23,35 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBg = (backgroundColor == null ||
+            backgroundColor == AppColors.surface ||
+            backgroundColor == AppColors.cardBackground)
+        ? context.colors.cardBackground
+        : (backgroundColor == AppColors.lightRed
+            ? context.colors.lightRed
+            : backgroundColor!);
+
+    final effectiveBorder = (borderColor == null || borderColor == AppColors.border)
+        ? context.colors.border
+        : (borderColor == AppColors.borderSubtle
+            ? context.colors.borderSubtle
+            : borderColor!);
+
     final border = BorderSide(
-      color: borderColor ?? AppColors.border,
+      color: effectiveBorder,
       width: 1,
     );
 
     final boxDecoration = BoxDecoration(
-      color: backgroundColor,
+      color: effectiveBg,
       borderRadius: BorderRadius.circular(borderRadius),
       border: Border.fromBorderSide(border),
       boxShadow: hasShadow
           ? [
-              const BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 10,
-                offset: Offset(0, 3),
+              BoxShadow(
+                color: context.colors.cardShadow,
+                blurRadius: context.isDarkMode ? 6 : 10,
+                offset: const Offset(0, 3),
               ),
             ]
           : null,
@@ -52,8 +66,8 @@ class CustomCard extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(borderRadius),
-            splashColor: AppColors.lightRed.withValues(alpha: 0.5),
-            highlightColor: AppColors.lightRed.withValues(alpha: 0.2),
+            splashColor: AppColors.primaryRed.withValues(alpha: 0.12),
+            highlightColor: AppColors.primaryRed.withValues(alpha: 0.06),
             child: Padding(
               padding: padding,
               child: child,
@@ -70,4 +84,3 @@ class CustomCard extends StatelessWidget {
     );
   }
 }
-

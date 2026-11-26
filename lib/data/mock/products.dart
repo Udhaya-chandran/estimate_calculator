@@ -206,7 +206,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '12 m (standard)', rate: 76.0, detail: '12 m'),
             ProductVariantOption(label: '40 ft / 12.19 m', rate: 76.0, detail: '12.19 m'),
-            ProductVariantOption(label: 'Cut to site length', rate: 76.0, detail: 'custom'),
+            // ProductVariantOption(label: 'Cut to site length', rate: 76.0, detail: 'custom'),
           ],
         ),
       ],
@@ -260,7 +260,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '6 m (standard)', rate: 0.0, detail: '6'),
             ProductVariantOption(label: '12 m', rate: 0.0, detail: '12'),
-            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: '6'),
+            // ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: '6'),
           ],
         ),
       ],
@@ -385,22 +385,22 @@ final List<Product> mockProducts = [
     subCategory: 'Round Pipes',
     name: 'SS Pipe (202 / 304 / 316)',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'metre',
-    rate: 173.16,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
-      quantityLabel: 'Quantity',
-      standardUnitLabel: 'm',
-      defaultUnit: LengthUnit.metres,
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 220.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
+      quantityLabel: 'Number of Pipes',
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: 'Stainless steel seamless and welded pipe for fittings and water lines.',
+    description: 'Stainless steel seamless and welded pipe. Calculated by theoretical weight from OD, gauge and length.',
     imageUrl: 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f7?auto=format&fit=crop&w=600&q=80',
     icon: Icons.water_drop_outlined,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'metre',
-      orderUnitLabels: ['Metre', 'Nos'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Rate is per running metre. Grade 316 carries a premium over 304.\n\nGST 18%.',
+          'Weight (kg/m) = (OD - thickness) × thickness × 0.02491. Total = Qty × Weight × ₹/kg.\n\nGST 18%.',
       gstPercent: 18.0,
       disclaimer:
           'Estimate only. Not a confirmed order — rates move daily, stock is subject to availability and final weight is settled on the weighbridge. Rate sheet dated 2026-11-20.',
@@ -408,19 +408,28 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Grade',
           options: [
-            ProductVariantOption(label: 'SS 202', rate: 173.16, rateUnit: 'metre'),
-            ProductVariantOption(label: 'SS 304', rate: 285.0, rateUnit: 'metre'),
-            ProductVariantOption(label: 'SS 316', rate: 519.75, rateUnit: 'metre'),
+            ProductVariantOption(label: 'SS 202', rate: 220.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'SS 304', rate: 340.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'SS 316', rate: 520.0, rateUnit: 'kg'),
+          ],
+        ),
+        ProductVariantGroup(
+          title: 'Gauge',
+          options: [
+            ProductVariantOption(label: '18 Gauge (1.2 mm)', rate: 0.0, detail: '1.2'),
+            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 0.0, detail: '1.6'),
+            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 0.0, detail: '2.0'),
+            ProductVariantOption(label: '12 Gauge (2.6 mm)', rate: 0.0, detail: '2.6'),
           ],
         ),
         ProductVariantGroup(
           title: 'Size',
           options: [
-            ProductVariantOption(label: '1/2" (15 mm)', rate: 173.16, rateUnit: 'metre', detail: '0.5'),
-            ProductVariantOption(label: '3/4" (20 mm)', rate: 240.24, rateUnit: 'metre', detail: '0.75'),
-            ProductVariantOption(label: '1" (25 mm)', rate: 340.86, rateUnit: 'metre', detail: '1.0'),
-            ProductVariantOption(label: '1½" (32 mm)', rate: 474.24, rateUnit: 'metre', detail: '1.5'),
-            ProductVariantOption(label: '2" (40 mm)', rate: 638.82, rateUnit: 'metre', detail: '2.0'),
+            ProductVariantOption(label: '1/2" (15 mm)', rate: 0.0, detail: '21.3'),
+            ProductVariantOption(label: '3/4" (20 mm)', rate: 0.0, detail: '26.7'),
+            ProductVariantOption(label: '1" (25 mm)', rate: 0.0, detail: '33.4'),
+            ProductVariantOption(label: '1½" (32 mm)', rate: 0.0, detail: '48.3'),
+            ProductVariantOption(label: '2" (40 mm)', rate: 0.0, detail: '60.3'),
           ],
         ),
         ProductVariantGroup(
@@ -428,6 +437,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '6 m', rate: 0.0, detail: '6'),
             ProductVariantOption(label: '12 m', rate: 0.0, detail: '12'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -490,6 +500,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -551,6 +562,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
             ProductVariantOption(label: '16.4 ft (5.0 m)', rate: 0.0, detail: '5.0'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -562,22 +574,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Square',
     name: 'MS Square Pipe',
     brand: 'Apollo Pipes',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 68.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 72.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: 'Structural square box pipe for balcony railings, staircases and roof trusses.',
+    description: 'Structural square box pipe for balcony railings, staircases and roof trusses. Billed by weight.',
     imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
     icon: Icons.square_outlined,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Structural hollow section rates per running foot/metre based on gauge and dimension.\n\n'
+          'Weight (kg/m) = (side - thickness) × thickness × 0.0314. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on hollow pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily with steel market. Rate sheet dated 2026-11-20.',
@@ -585,26 +597,26 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Apollo Pipes', rate: 68.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Structura', rate: 74.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Saudi Steels', rate: 64.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Jindal', rate: 66.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Apollo Pipes', rate: 72.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Structura', rate: 78.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 68.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Jindal', rate: 70.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Thickness & Gauge',
           options: [
-            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 68.0, rateUnit: 'ft'),
-            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 82.0, rateUnit: 'ft'),
-            ProductVariantOption(label: '12 Gauge (2.6 mm)', rate: 104.0, rateUnit: 'ft'),
+            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 0.0, detail: '1.6'),
+            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 0.0, detail: '2.0'),
+            ProductVariantOption(label: '12 Gauge (2.6 mm)', rate: 0.0, detail: '2.6'),
           ],
         ),
         ProductVariantGroup(
           title: 'Size',
           options: [
-            ProductVariantOption(label: '1" × 1" (25×25 mm)', rate: 52.0, rateUnit: 'ft', detail: '25'),
-            ProductVariantOption(label: '1.5" × 1.5" (38×38 mm)', rate: 68.0, rateUnit: 'ft', detail: '38'),
-            ProductVariantOption(label: '2" × 2" (50×50 mm)', rate: 98.0, rateUnit: 'ft', detail: '50'),
+            ProductVariantOption(label: '1" × 1" (25×25 mm)', rate: 0.0, detail: '25'),
+            ProductVariantOption(label: '1.5" × 1.5" (38×38 mm)', rate: 0.0, detail: '38'),
+            ProductVariantOption(label: '2" × 2" (50×50 mm)', rate: 0.0, detail: '50'),
           ],
         ),
         ProductVariantGroup(
@@ -612,6 +624,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -624,22 +637,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Round',
     name: 'GI Round Pipe 1"',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 65.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 78.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: '1 Inch (25 NB) • 14 Gauge (2.0mm). Galvanized rust-resistant round pipe.',
+    description: '1 Inch (25 NB) Galvanized rust-resistant round pipe. Billed by weight.',
     imageUrl: 'https://s75ml08aciksg.space.mcode.io/assets/img/img-pipes.jpg',
     icon: Icons.album_outlined,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Price per running foot. Standard length 20 ft (6.1 m). Shorter cuts may attract cutting charges.\n\n'
+          'Weight (kg/m) = (OD - thickness) × thickness × 0.02466. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on galvanized pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily. Final settle on weighbridge. Rate sheet dated 2026-11-20.',
@@ -647,28 +660,28 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Saudi Steels', rate: 65.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Pipes', rate: 72.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Jindal Star', rate: 68.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Apollo', rate: 64.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 78.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Pipes', rate: 85.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Jindal Star', rate: 80.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Apollo', rate: 76.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Class',
           options: [
-            ProductVariantOption(label: 'Medium (B Class)', rate: 65.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Light (A Class)', rate: 58.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Heavy (C Class)', rate: 74.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Medium (B Class · 3.2 mm)', rate: 0.0, detail: '3.2'),
+            ProductVariantOption(label: 'Light (A Class · 2.6 mm)', rate: 0.0, detail: '2.6'),
+            ProductVariantOption(label: 'Heavy (C Class · 4.0 mm)', rate: 0.0, detail: '4.0'),
           ],
         ),
         ProductVariantGroup(
           title: 'Size',
           options: [
-            ProductVariantOption(label: '1/2" (15 NB)', rate: 42.0, rateUnit: 'ft', detail: '15'),
-            ProductVariantOption(label: '3/4" (20 NB)', rate: 52.0, rateUnit: 'ft', detail: '20'),
-            ProductVariantOption(label: '1" (25 NB)', rate: 65.0, rateUnit: 'ft', detail: '25'),
-            ProductVariantOption(label: '1.5" (40 NB)', rate: 90.0, rateUnit: 'ft', detail: '40'),
-            ProductVariantOption(label: '2" (50 NB)', rate: 110.0, rateUnit: 'ft', detail: '50'),
+            ProductVariantOption(label: '1/2" (15 NB)', rate: 0.0, detail: '21.3'),
+            ProductVariantOption(label: '3/4" (20 NB)', rate: 0.0, detail: '26.7'),
+            ProductVariantOption(label: '1" (25 NB)', rate: 0.0, detail: '33.7'),
+            ProductVariantOption(label: '1.5" (40 NB)', rate: 0.0, detail: '48.3'),
+            ProductVariantOption(label: '2" (50 NB)', rate: 0.0, detail: '60.3'),
           ],
         ),
         ProductVariantGroup(
@@ -676,6 +689,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -687,22 +701,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Round',
     name: 'GI Round Pipe 2"',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 110.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 78.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: '2 Inch (50 NB) • 14 Gauge (2.0mm). Galvanized rust-resistant round pipe.',
+    description: '2 Inch (50 NB) Galvanized rust-resistant round pipe. Billed by weight.',
     imageUrl: 'https://s75ml08aciksg.space.mcode.io/assets/img/img-pipes.jpg',
     icon: Icons.album_outlined,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Price per running foot. Standard length 20 ft (6.1 m).\n\n'
+          'Weight (kg/m) = (60.3 - thickness) × thickness × 0.02466. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on galvanized pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily. Final settle on weighbridge. Rate sheet dated 2026-11-20.',
@@ -710,18 +724,18 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Saudi Steels', rate: 110.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Pipes', rate: 122.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Jindal Star', rate: 115.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Apollo', rate: 108.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 78.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Pipes', rate: 85.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Jindal Star', rate: 80.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Apollo', rate: 76.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Class',
           options: [
-            ProductVariantOption(label: 'Medium (B Class)', rate: 110.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Light (A Class)', rate: 98.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Heavy (C Class)', rate: 125.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Medium (B Class · 3.6 mm)', rate: 0.0, detail: '3.6'),
+            ProductVariantOption(label: 'Light (A Class · 2.9 mm)', rate: 0.0, detail: '2.9'),
+            ProductVariantOption(label: 'Heavy (C Class · 4.5 mm)', rate: 0.0, detail: '4.5'),
           ],
         ),
         ProductVariantGroup(
@@ -729,6 +743,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -741,22 +756,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Square',
     name: 'GI Square Pipe 1"x1"',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 58.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 76.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: '1" × 1" (25×25mm) • 16 Gauge (1.6mm). Galvanized hollow square pipe.',
+    description: '1" × 1" (25×25mm) Galvanized hollow square pipe. Billed by weight.',
     imageUrl: 'https://s75ml08aciksg.space.mcode.io/assets/img/img-steels.jpg',
     icon: Icons.crop_square_rounded,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Galvanized hollow section rates per running foot/metre based on gauge and dimension.\n\n'
+          'Weight (kg/m) = (25 - thickness) × thickness × 0.0314. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on hollow pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily. Final settle on weighbridge. Rate sheet dated 2026-11-20.',
@@ -764,16 +779,16 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Saudi Steels', rate: 58.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Apollo Pipes', rate: 62.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Structura', rate: 66.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 76.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Apollo Pipes', rate: 80.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Structura', rate: 84.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Gauge',
           options: [
-            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 58.0, rateUnit: 'ft'),
-            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 70.0, rateUnit: 'ft'),
+            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 0.0, detail: '1.6'),
+            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 0.0, detail: '2.0'),
           ],
         ),
         ProductVariantGroup(
@@ -781,6 +796,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -792,22 +808,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Square',
     name: 'GI Rect Pipe 2"x1"',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 78.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 76.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: '2" × 1" (50×25mm) • 16 Gauge (1.6mm). Galvanized hollow rectangular pipe.',
+    description: '2" × 1" (50×25mm) Galvanized hollow rectangular pipe. Billed by weight.',
     imageUrl: 'https://s75ml08aciksg.space.mcode.io/assets/img/img-steels.jpg',
     icon: Icons.crop_landscape_rounded,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Galvanized hollow section rates per running foot/metre based on gauge and dimension.\n\n'
+          'Weight (kg/m) = (50 + 25 - 2 × thickness) × thickness × 0.0157. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on hollow pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily. Final settle on weighbridge. Rate sheet dated 2026-11-20.',
@@ -815,16 +831,16 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Saudi Steels', rate: 78.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Apollo Pipes', rate: 82.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Structura', rate: 88.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 76.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Apollo Pipes', rate: 80.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Structura', rate: 84.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Gauge',
           options: [
-            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 78.0, rateUnit: 'ft'),
-            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 94.0, rateUnit: 'ft'),
+            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 0.0, detail: '1.6'),
+            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 0.0, detail: '2.0'),
           ],
         ),
         ProductVariantGroup(
@@ -832,6 +848,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],
@@ -843,22 +860,22 @@ final List<Product> mockProducts = [
     subCategory: 'GI Square',
     name: 'GI Square Pipe 2"x2"',
     brand: 'Saudi Steels',
-    measurementType: MeasurementType.lengthBased,
-    pricingUnit: 'foot',
-    rate: 115.0,
-    measurementConfiguration: MeasurementConfiguration.lengthBased(
+    measurementType: MeasurementType.weightBased,
+    pricingUnit: 'kg',
+    rate: 76.0,
+    measurementConfiguration: MeasurementConfiguration.weightBased(
       quantityLabel: 'Number of Pipes',
-      standardUnitLabel: 'ft',
-      defaultUnit: LengthUnit.feet,
+      standardUnitLabel: 'kg',
+      defaultWeightUnit: WeightUnit.kilograms,
     ),
-    description: '2" × 2" (50×50mm) • 16 Gauge (1.6mm). Galvanized hollow square pipe.',
+    description: '2" × 2" (50×50mm) Galvanized hollow square pipe. Billed by weight.',
     imageUrl: 'https://s75ml08aciksg.space.mcode.io/assets/img/img-steels.jpg',
     icon: Icons.crop_square_rounded,
     variantConfig: const ProductVariantConfig(
-      pricingUnitLabel: 'foot',
-      orderUnitLabels: ['Metre', 'Nos', 'Feet'],
+      pricingUnitLabel: 'kg',
+      orderUnitLabels: ['Nos', 'Metre', 'Kg'],
       howCalculatedText:
-          'Galvanized hollow section rates per running foot/metre based on gauge and dimension.\n\n'
+          'Weight (kg/m) = (50 - thickness) × thickness × 0.0314. Total = Qty × Weight × ₹/kg.\n\n'
           'GST 18% on hollow pipes (HSN 7306).',
       gstPercent: 18.0,
       disclaimer: 'Estimate only. Rates move daily. Final settle on weighbridge. Rate sheet dated 2026-11-20.',
@@ -866,16 +883,16 @@ final List<Product> mockProducts = [
         ProductVariantGroup(
           title: 'Brand',
           options: [
-            ProductVariantOption(label: 'Saudi Steels', rate: 115.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Apollo Pipes', rate: 122.0, rateUnit: 'ft'),
-            ProductVariantOption(label: 'Tata Structura', rate: 130.0, rateUnit: 'ft'),
+            ProductVariantOption(label: 'Saudi Steels', rate: 76.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Apollo Pipes', rate: 80.0, rateUnit: 'kg'),
+            ProductVariantOption(label: 'Tata Structura', rate: 84.0, rateUnit: 'kg'),
           ],
         ),
         ProductVariantGroup(
           title: 'Gauge',
           options: [
-            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 115.0, rateUnit: 'ft'),
-            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 138.0, rateUnit: 'ft'),
+            ProductVariantOption(label: '16 Gauge (1.6 mm)', rate: 0.0, detail: '1.6'),
+            ProductVariantOption(label: '14 Gauge (2.0 mm)', rate: 0.0, detail: '2.0'),
           ],
         ),
         ProductVariantGroup(
@@ -883,6 +900,7 @@ final List<Product> mockProducts = [
           options: [
             ProductVariantOption(label: '20 ft (6.10 m)', rate: 0.0, detail: '6.10'),
             ProductVariantOption(label: '10 ft (3.05 m)', rate: 0.0, detail: '3.05'),
+            ProductVariantOption(label: 'Cut to length', rate: 0.0, detail: 'custom'),
           ],
         ),
       ],

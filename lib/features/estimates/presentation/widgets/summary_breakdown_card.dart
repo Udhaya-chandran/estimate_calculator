@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:estimate_calculator/app/theme/app_colors.dart';
-import 'package:estimate_calculator/app/theme/app_text_styles.dart';
 import 'package:estimate_calculator/core/utils/currency_formatter.dart';
 import 'package:estimate_calculator/core/widgets/custom_card.dart';
 import 'package:estimate_calculator/features/estimates/domain/entities/estimate_item.dart';
@@ -22,36 +21,37 @@ class SummaryBreakdownCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.table_chart_outlined, size: 16, color: AppColors.primaryRed),
+              Icon(Icons.table_chart_outlined, size: 16, color: context.colors.secondaryText),
               const SizedBox(width: 7),
-              const Text(
+              Text(
                 'Product Cost Breakdown',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primaryText,
+                  color: context.colors.primaryText,
                 ),
               ),
               const Spacer(),
               Text(
                 '${items.length} items',
-                style: AppTextStyles.bodySmall.copyWith(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 11,
+                  color: context.colors.secondaryText,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: context.colors.border),
           const SizedBox(height: 6),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: items.length,
-            separatorBuilder: (_, _) => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 6.0),
-              child: Divider(height: 1, color: AppColors.borderSubtle),
+            separatorBuilder: (_, _) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Divider(height: 1, color: context.colors.borderSubtle),
             ),
             itemBuilder: (context, index) {
               final item = items[index];
@@ -63,15 +63,15 @@ class SummaryBreakdownCard extends StatelessWidget {
                     height: 20,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppColors.lightRed,
+                      color: context.colors.segmentedSelectedBg,
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
                       '${index + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryRed,
+                        color: context.colors.primaryText,
                       ),
                     ),
                   ),
@@ -82,30 +82,39 @@ class SummaryBreakdownCard extends StatelessWidget {
                       children: [
                         Text(
                           item.product.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primaryText,
+                            color: context.colors.primaryText,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           item.breakdown,
-                          style: const TextStyle(
-                            color: AppColors.secondaryText,
+                          style: TextStyle(
+                            color: context.colors.secondaryText,
                             fontSize: 11,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Rate: ${CurrencyFormatter.formatRate(item.rateSnapshot, item.product.pricingUnit)}',
+                          style: TextStyle(
+                            color: context.colors.secondaryText,
+                            fontSize: 10.5,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Text(
                     CurrencyFormatter.format(item.totalAmount),
-                    style: const TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryText,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: context.colors.primaryText,
                     ),
                   ),
                 ],

@@ -188,20 +188,29 @@ void main() {
     // Check header and pill variants
     expect(find.text('SS Pipe (202 / 304 / 316)'), findsWidgets);
     expect(find.text('SS 202'), findsWidgets);
+    expect(find.text('18 Gauge (1.2 mm)'), findsWidgets);
     expect(find.text('1/2" (15 mm)'), findsWidgets);
     expect(find.text('6 m'), findsWidgets);
 
-    // Check Live estimate details matching reference screenshot
-    expect(find.text('1 m'), findsOneWidget);
-    expect(find.text('₹173.16 / Metre'), findsOneWidget);
-    expect(find.text('₹204.33'), findsOneWidget);
-    expect(find.text('₹31.17'), findsOneWidget);
+    // Weight-based SS Pipe calculation check (21.3mm OD, 1.2mm wall, 6m = 3.60 kg @ ₹220/kg)
+    expect(find.text('1 nos × 3.60 kg (6.00 m)'), findsOneWidget);
+    expect(find.text('₹220 / Kg'), findsOneWidget);
+    expect(find.text('₹935.85'), findsOneWidget);
+    expect(find.text('₹142.76'), findsOneWidget);
 
     // Check rate card values
-    expect(find.text('per Metre'), findsOneWidget);
-    expect(find.text('₹173.16'), findsOneWidget);
+    expect(find.text('per Kg'), findsOneWidget);
+    expect(find.text('₹220'), findsOneWidget);
     expect(find.text('per Nos'), findsOneWidget);
-    expect(find.text('₹1,038.96'), findsOneWidget);
+
+    // Select Cut to length and verify price updates based on entered ft (default 10 ft = 3.05 m)
+    final cutChip = find.text('Cut to length', findRichText: true);
+    await tester.ensureVisible(cutChip);
+    await tester.tap(cutChip);
+    await tester.pumpAndSettle();
+    expect(find.text('= 3.05 m'), findsOneWidget);
+    expect(find.text('1 cut × 1.83 kg (10 ft / 3.05 m)'), findsOneWidget);
+    expect(find.text('₹475.41'), findsOneWidget);
   });
 
   testWidgets('ProductCalculatorScreen loads TMT Bar Fe 500D calculator correctly', (WidgetTester tester) async {
@@ -259,7 +268,7 @@ void main() {
 
     expect(find.text('OPC 53 Grade Cement'), findsWidgets);
     expect(find.text('UltraTech'), findsWidgets);
-    expect(find.text('1 bags'), findsOneWidget);
+    expect(find.text('1 bag (50 kg)'), findsOneWidget);
     expect(find.text('₹385 / Bags'), findsOneWidget);
     expect(find.text('₹454.3'), findsOneWidget);
     expect(find.text('₹69.3'), findsOneWidget);
@@ -269,6 +278,11 @@ void main() {
     expect(find.text('₹385'), findsOneWidget);
     expect(find.text('per Tonnes'), findsOneWidget);
     expect(find.text('₹7,700'), findsOneWidget);
+
+    // Switch to Tonnes and verify bags + kg conversion
+    await tester.tap(find.text('Tonnes'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 tonne (20 bags · 1,000 kg)'), findsOneWidget);
   });
 
   testWidgets('ProductCalculatorScreen loads MS Steel Plate calculator correctly', (WidgetTester tester) async {

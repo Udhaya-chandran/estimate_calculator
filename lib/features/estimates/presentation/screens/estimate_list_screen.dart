@@ -30,7 +30,13 @@ class EstimateListScreen extends ConsumerWidget {
               onPressed: () {
                 _showClearConfirmationDialog(context, ref);
               },
-              child: const Text('Clear All', style: TextStyle(color: AppColors.primaryRed)),
+              child: Text(
+                'Clear All',
+                style: TextStyle(
+                  color: context.colors.secondaryText,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
         ],
       ),
@@ -42,33 +48,67 @@ class EstimateListScreen extends ConsumerWidget {
               buttonText: 'Add First Product',
               onButtonPressed: () => context.go('/categories'),
             )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return EstimateItemTile(
-                  item: item,
-                  onEdit: () {
-                    // Load into calculator in editing mode
-                    ref.read(calculatorProvider.notifier).initForProduct(
-                          item.product,
-                          existingItem: item,
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 768;
+
+                final listWidget = ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return EstimateItemTile(
+                      item: item,
+                      onEdit: () {
+                        // Load into calculator in editing mode
+                        ref.read(calculatorProvider.notifier).initForProduct(
+                              item.product,
+                              existingItem: item,
+                            );
+                        context.push('/calculator');
+                      },
+                      onDelete: () {
+                        ref.read(estimateProvider.notifier).removeItem(item.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: context.isDarkMode
+                                ? context.colors.surfaceElevated
+                                : const Color(0xFF1F2937),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: context.isDarkMode
+                                  ? BorderSide(color: context.colors.border, width: 1)
+                                  : BorderSide.none,
+                            ),
+                            content: Text(
+                              '${item.product.name} removed',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: context.isDarkMode
+                                    ? context.colors.primaryText
+                                    : Colors.white,
+                              ),
+                            ),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
-                    context.push('/calculator');
-                  },
-                  onDelete: () {
-                    ref.read(estimateProvider.notifier).removeItem(item.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${item.product.name} removed'),
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                      },
                     );
                   },
                 );
+
+                if (isWide) {
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: listWidget,
+                    ),
+                  );
+                }
+
+                return listWidget;
               },
             ),
       bottomNavigationBar: BottomEstimateBar(
@@ -86,13 +126,20 @@ class EstimateListScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear Current Estimate?'),
-        content: const Text('This will remove all items from this estimation session.'),
+        backgroundColor: context.colors.surface,
+        title: Text(
+          'Clear Current Estimate?',
+          style: TextStyle(color: context.colors.primaryText, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'This will remove all items from this estimation session.',
+          style: TextStyle(color: context.colors.secondaryText),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.secondaryText)),
+            child: Text('Cancel', style: TextStyle(color: context.colors.secondaryText)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

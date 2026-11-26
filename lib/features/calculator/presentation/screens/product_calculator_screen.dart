@@ -8,17 +8,8 @@ import 'package:estimate_calculator/features/estimates/presentation/providers/es
 import 'package:estimate_calculator/shared/widgets/app_header.dart';
 import '../providers/calculator_provider.dart';
 
-// ─── Palette ───────────────────────────────────────────────────────
-const _activePill = Color(0xFF8A0000);
-const _pillBg     = Color(0xFFF4F4F6);
-const _pillBorder = Color(0xFFE5E7EB);
-const _sectionLbl = Color(0xFF8A92A6);
-const _pageBg     = Color(0xFFF3F4F6);
-const _darkTxt    = Color(0xFF111827);
-const _mutedTxt   = Color(0xFF6B7280);
-
-// Default unit tabs for steel/pipes
-const _defaultOrderUnits = ['Nos', 'Metre', 'Kg', 'Tonnes'];
+// Default unit tabs for steel/pipes (commented out below quantity)
+// const _defaultOrderUnits = ['Nos', 'Metre', 'Kg', 'Tonnes'];
 
 class ProductCalculatorScreen extends ConsumerStatefulWidget {
   const ProductCalculatorScreen({super.key});
@@ -31,10 +22,26 @@ class ProductCalculatorScreen extends ConsumerStatefulWidget {
 class _ProductCalculatorScreenState
     extends ConsumerState<ProductCalculatorScreen> {
   final _qtyCtrl = TextEditingController(text: '1');
+  final _cutLengthCtrl = TextEditingController(text: '10');
+
+  @override
+  void initState() {
+    super.initState();
+    final initState = ref.read(calculatorProvider);
+    if (initState.quantity > 0) {
+      _qtyCtrl.text = initState.quantity.toString();
+    }
+    if (initState.length != null && initState.length! > 0) {
+      _cutLengthCtrl.text = initState.length == initState.length!.roundToDouble()
+          ? initState.length!.toInt().toString()
+          : initState.length!.toString();
+    }
+  }
 
   @override
   void dispose() {
     _qtyCtrl.dispose();
+    _cutLengthCtrl.dispose();
     super.dispose();
   }
 
@@ -47,7 +54,12 @@ class _ProductCalculatorScreenState
     if (product == null) {
       return Scaffold(
         appBar: const AppHeader(title: 'Calculator', showBackButton: true),
-        body: const Center(child: Text('No product selected.')),
+        body: Center(
+          child: Text(
+            'No product selected.',
+            style: TextStyle(color: context.colors.secondaryText),
+          ),
+        ),
       );
     }
 
@@ -55,7 +67,7 @@ class _ProductCalculatorScreenState
     final isEditing = state.isEditing;
 
     return Scaffold(
-      backgroundColor: _pageBg,
+      backgroundColor: context.colors.background,
       appBar: AppHeader(
         title: isEditing ? 'Edit Item' : 'Product Calculator',
         subtitle: product.name,
@@ -91,10 +103,10 @@ class _ProductCalculatorScreenState
               children: [
                 Text(
                   product.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w900,
-                    color: _darkTxt,
+                    color: context.colors.primaryText,
                     letterSpacing: -0.3,
                   ),
                 ),
@@ -102,8 +114,11 @@ class _ProductCalculatorScreenState
                   const SizedBox(height: 4),
                   Text(
                     product.description!,
-                    style: const TextStyle(
-                        fontSize: 11.5, color: _mutedTxt, height: 1.35),
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: context.colors.secondaryText,
+                      height: 1.35,
+                    ),
                   ),
                 ],
               ],
@@ -121,9 +136,11 @@ class _ProductCalculatorScreenState
 
           final quantityCard = _buildQuantityCard(state, vc);
 
+          /*
           final howCard = (vc != null && vc.howCalculatedText.isNotEmpty)
               ? _buildHowCard(vc)
               : null;
+          */
 
           final estimateCard = _buildLiveEstimate(state, product);
           final addBtn = _buildAddButton(state, isEditing);
@@ -149,10 +166,12 @@ class _ProductCalculatorScreenState
                             const SizedBox(height: 10),
                             ...variantCards,
                             quantityCard,
+                            /*
                             if (howCard != null) ...[
                               const SizedBox(height: 10),
                               howCard,
                             ],
+                            */
                           ],
                         ),
                       ),
@@ -190,10 +209,12 @@ class _ProductCalculatorScreenState
                 ...variantCards,
                 quantityCard,
                 const SizedBox(height: 10),
+                /*
                 if (howCard != null) ...[
                   howCard,
                   const SizedBox(height: 10),
                 ],
+                */
                 estimateCard,
                 const SizedBox(height: 16),
                 addBtn,
@@ -212,12 +233,12 @@ class _ProductCalculatorScreenState
       width: double.infinity,
       padding: padding ?? const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+        border: Border.all(color: context.colors.border, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
+            color: context.colors.cardShadow,
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -237,6 +258,11 @@ class _ProductCalculatorScreenState
     final isCementBrand = vc.pricingUnitLabel == 'bags';
     final isTwoPerRow = group.title.toLowerCase().contains('diameter') ||
                         group.title.toLowerCase().contains('size');
+    final isPipe = state.product?.categoryId == 'cat_pipes';
+    final isCutToLength = isPipe &&
+        group.title == 'Length' &&
+        (selOpt.detail == 'custom' ||
+            selOpt.label.toLowerCase().contains('cut'));
 
     return _card(
       child: Column(
@@ -246,14 +272,16 @@ class _ProductCalculatorScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(group.title,
-                  style: const TextStyle(
-                      fontSize: 12.5, fontWeight: FontWeight.w700, color: _darkTxt)),
+                  style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.primaryText)),
               Text(
                 selOpt.label,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryRed),
+                    color: context.colors.primaryText),
               ),
             ],
           ),
@@ -281,10 +309,10 @@ class _ProductCalculatorScreenState
                       alignment: isTwoPerRow ? Alignment.center : null,
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isSel ? _activePill : _pillBg,
+                        color: isSel ? context.colors.activePill : context.colors.pillBg,
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: isSel ? _activePill : _pillBorder,
+                          color: isSel ? context.colors.activePill : context.colors.pillBorder,
                           width: 1.1,
                         ),
                       ),
@@ -297,7 +325,7 @@ class _ProductCalculatorScreenState
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w700,
-                                color: isSel ? Colors.white : _darkTxt,
+                                color: isSel ? Colors.white : context.colors.primaryText,
                               ),
                             ),
                             if (opt.rate > 0)
@@ -311,8 +339,8 @@ class _ProductCalculatorScreenState
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w500,
                                   color: isSel
-                                      ? Colors.white.withValues(alpha: 0.80)
-                                      : _mutedTxt,
+                                      ? Colors.white.withValues(alpha: 0.85)
+                                      : context.colors.secondaryText,
                                 ),
                               ),
                           ]),
@@ -324,14 +352,119 @@ class _ProductCalculatorScreenState
               );
             },
           ),
+          if (isCutToLength) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: context.colors.inputBg,
+                      border: Border.all(color: context.colors.border, width: 1.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _cutLengthCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: context.colors.primaryText,
+                            ),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              hintText: 'Enter ft',
+                              hintStyle: TextStyle(
+                                fontSize: 12,
+                                color: context.colors.hintText,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            onChanged: (v) {
+                              final ft = double.tryParse(v);
+                              ref.read(calculatorProvider.notifier).updateLength(
+                                    (ft != null && ft > 0) ? ft : 0.0,
+                                  );
+                            },
+                          ),
+                        ),
+                        Text(
+                          'ft',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: context.colors.secondaryText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 4,
+                  child: Container(
+                    height: 38,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: context.colors.pillBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.colors.borderSubtle, width: 1),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    child: Builder(
+                      builder: (context) {
+                        final ftVal = (state.length != null && state.length! > 0)
+                            ? state.length!
+                            : 0.0;
+                        final meterVal = ftVal * 0.3048;
+                        return Text(
+                          '= ${meterVal.toStringAsFixed(2)} m',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: context.colors.primaryText,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  // ─── Quantity + Unit-Tab Card ────────────────────────────────────
+  // ─── Quantity Card (Bag/Tonne option enabled for Cement; commented out for others) ──────
   Widget _buildQuantityCard(CalculatorInputState state, ProductVariantConfig? vc) {
-    final unitLabels = vc?.orderUnitLabels ?? _defaultOrderUnits;
+    final product = state.product;
+    final isCement = product != null &&
+        (product.categoryId == 'cat_cement' || vc?.pricingUnitLabel == 'bags');
+    final unitLabels = vc?.orderUnitLabels ?? const ['Bags', 'Tonnes'];
+
+    final unitsPerTonne = vc?.unitsPerTonne ?? 20.0;
+    final kgPerBag = (1000.0 / unitsPerTonne).round();
+    final qty = state.quantity > 0 ? state.quantity : 1;
+    final safeIdx =
+        state.orderUnitIndex < unitLabels.length ? state.orderUnitIndex : 0;
+    final isTonne =
+        isCement && unitLabels[safeIdx].toLowerCase().contains('tonne');
+    final totalBags = isTonne ? (qty * unitsPerTonne).round() : qty;
+    final totalKg = totalBags * kgPerBag;
 
     return _card(
       child: Column(
@@ -339,26 +472,36 @@ class _ProductCalculatorScreenState
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text('Quantity',
                   style: TextStyle(
-                      fontSize: 12.5, fontWeight: FontWeight.w700, color: _darkTxt)),
-              Text('Order in the unit you buy in',
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.primaryRed,
-                      fontWeight: FontWeight.w600)),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.primaryText)),
+              if (isCement)
+                Flexible(
+                  child: Text(
+                    isTonne
+                        ? '$qty ${qty == 1 ? 'tonne' : 'tonnes'} = $totalBags bags (${_addCommas('$totalKg')} kg)'
+                        : '$qty ${qty == 1 ? 'bag' : 'bags'} = ${_addCommas('$totalKg')} kg ($kgPerBag kg/bag)',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: context.colors.secondaryText,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 9),
 
           // Quantity input in its own row
           Container(
-            width: 100,
-            height: 38,
+            width: double.infinity,
+            height: 42,
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFD1D5DB), width: 1.2),
+              color: context.colors.inputBg,
+              border: Border.all(color: context.colors.border, width: 1.2),
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.centerLeft,
@@ -366,12 +509,16 @@ class _ProductCalculatorScreenState
             child: TextField(
               controller: _qtyCtrl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w700, color: _darkTxt),
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.primaryText),
               decoration: const InputDecoration(
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
               onChanged: (v) {
                 final n = int.tryParse(v) ?? 1;
@@ -380,15 +527,98 @@ class _ProductCalculatorScreenState
             ),
           ),
 
+          if (isCement) ...[
+            const SizedBox(height: 9),
+            // Bag / Tonne segmented tabs for Cement
+            Container(
+              height: 36,
+              decoration: BoxDecoration(
+                color: context.colors.inputBg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: context.colors.border, width: 1.1),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Row(
+                  children: unitLabels.asMap().entries.map((e) {
+                    final idx = e.key;
+                    final label = e.value;
+                    final isSel = idx == safeIdx;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => ref
+                            .read(calculatorProvider.notifier)
+                            .setOrderUnitIndex(idx),
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          height: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: isSel
+                                ? context.colors.segmentedSelectedBg
+                                : context.colors.inputBg,
+                            border: idx > 0
+                                ? Border(
+                                    left: BorderSide(
+                                        color: context.colors.border, width: 1))
+                                : null,
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight:
+                                      isSel ? FontWeight.w800 : FontWeight.w600,
+                                  color: isSel
+                                      ? context.colors.primaryText
+                                      : context.colors.secondaryText,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 7),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: context.colors.pillBg,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: context.colors.borderSubtle, width: 1),
+              ),
+              child: Text(
+                isTonne
+                    ? '1 tonne = ${unitsPerTonne.toInt()} bags (1,000 kg) • Selected: $totalBags bags (${_addCommas('$totalKg')} kg)'
+                    : '1 bag = $kgPerBag kg • Selected: $totalBags ${totalBags == 1 ? 'bag' : 'bags'} (${_addCommas('$totalKg')} kg)',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: context.colors.secondaryText,
+                ),
+              ),
+            ),
+          ],
+
+          /*
           const SizedBox(height: 9),
 
-          // Unit segmented tabs in another row below
+          // Unit segmented tabs in another row below (Nos, Metre, Kg, Tonnes, etc.)
           Container(
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.colors.inputBg,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFD1D5DB), width: 1.1),
+              border: Border.all(color: context.colors.border, width: 1.1),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(7),
@@ -407,11 +637,11 @@ class _ProductCalculatorScreenState
                         height: double.infinity,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFFFDF2F2) : Colors.white,
+                          color: isSel ? context.colors.segmentedSelectedBg : context.colors.inputBg,
                           border: idx > 0
-                              ? const Border(
+                              ? Border(
                                   left: BorderSide(
-                                      color: Color(0xFFE5E7EB), width: 1))
+                                      color: context.colors.border, width: 1))
                               : null,
                         ),
                         child: FittedBox(
@@ -423,7 +653,7 @@ class _ProductCalculatorScreenState
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
-                                color: isSel ? AppColors.primaryRed : _darkTxt,
+                                color: isSel ? context.colors.primaryText : context.colors.secondaryText,
                               ),
                             ),
                           ),
@@ -435,11 +665,13 @@ class _ProductCalculatorScreenState
               ),
             ),
           ),
+          */
         ],
       ),
     );
   }
 
+  /*
   // ─── HOW THIS IS CALCULATED card ────────────────────────────────
   Widget _buildHowCard(ProductVariantConfig vc) {
     final paras = vc.howCalculatedText
@@ -451,29 +683,32 @@ class _ProductCalculatorScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'HOW THIS IS CALCULATED',
             style: TextStyle(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
-                color: _sectionLbl,
+                color: context.colors.secondaryText,
                 letterSpacing: 1.0),
           ),
           const SizedBox(height: 8),
           for (int i = 0; i < paras.length; i++) ...[
             if (i > 0) const _Div(),
             Text(paras[i].trim(),
-                style: const TextStyle(fontSize: 11.5, color: _darkTxt, height: 1.4)),
+                style: TextStyle(
+                    fontSize: 11.5, color: context.colors.primaryText, height: 1.4)),
           ],
           if (vc.cuttingChargeNote != null) ...[
             const _Div(),
             Text(vc.cuttingChargeNote!,
-                style: const TextStyle(fontSize: 11.5, color: _darkTxt, height: 1.4)),
+                style: TextStyle(
+                    fontSize: 11.5, color: context.colors.primaryText, height: 1.4)),
           ],
         ],
       ),
     );
   }
+  */
 
   // ─── Live Estimate card ──────────────────────────────────────────
   Widget _buildLiveEstimate(CalculatorInputState state, dynamic product) {
@@ -486,13 +721,13 @@ class _ProductCalculatorScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Live estimate',
+              Text('Live estimate',
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: _darkTxt)),
+                      color: context.colors.primaryText)),
               Text(info.headerRateString,
-                  style: const TextStyle(fontSize: 11, color: _mutedTxt)),
+                  style: TextStyle(fontSize: 11, color: context.colors.secondaryText)),
             ],
           ),
           const SizedBox(height: 8),
@@ -502,20 +737,23 @@ class _ProductCalculatorScreenState
               Expanded(
                 child: Text(
                   product.name as String,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12,
-                      color: _darkTxt,
+                      color: context.colors.primaryText,
                       fontWeight: FontWeight.w500),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                info.breakdownQtyText,
-                style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    color: _darkTxt),
+              Flexible(
+                child: Text(
+                  info.breakdownQtyText,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.primaryText),
+                ),
               ),
             ],
           ),
@@ -523,13 +761,13 @@ class _ProductCalculatorScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Rate applied',
-                  style: TextStyle(fontSize: 11, color: _mutedTxt)),
+              Text('Rate applied',
+                  style: TextStyle(fontSize: 11, color: context.colors.secondaryText)),
               Text(
                 '₹${info.appliedRate == info.appliedRate.roundToDouble() ? info.appliedRate.toInt() : info.appliedRate.toStringAsFixed(2)} / ${info.appliedRateUnit}',
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 11.5,
-                    color: _darkTxt,
+                    color: context.colors.primaryText,
                     fontWeight: FontWeight.w600),
               ),
             ],
@@ -542,18 +780,18 @@ class _ProductCalculatorScreenState
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              const Text('ESTIMATED TOTAL',
+              Text('ESTIMATED TOTAL',
                   style: TextStyle(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
-                      color: _sectionLbl,
+                      color: context.colors.secondaryText,
                       letterSpacing: 0.9)),
               Text(
                 _formatNum(info.totalWithGst),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.primaryRed,
+                  color: context.colors.primaryText,
                   letterSpacing: -0.4,
                 ),
               ),
@@ -564,19 +802,19 @@ class _ProductCalculatorScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('GST ${info.gstPercent.toInt()}%',
-                  style: const TextStyle(fontSize: 11, color: _mutedTxt)),
+                  style: TextStyle(fontSize: 11, color: context.colors.secondaryText)),
               Text(_formatNum(info.gstAmount),
-                  style: const TextStyle(fontSize: 11, color: _mutedTxt)),
+                  style: TextStyle(fontSize: 11, color: context.colors.secondaryText)),
             ],
           ),
           const _Div(),
 
           // RATE CARD FOR THIS VARIANT
-          const Text('RATE CARD FOR THIS VARIANT',
+          Text('RATE CARD FOR THIS VARIANT',
               style: TextStyle(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
-                  color: _sectionLbl,
+                  color: context.colors.secondaryText,
                   letterSpacing: 1.0)),
           const SizedBox(height: 8),
           for (final entry in info.rateCard)
@@ -624,11 +862,11 @@ class _ProductCalculatorScreenState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: _mutedTxt)),
+          Text(label, style: TextStyle(fontSize: 12, color: context.colors.secondaryText)),
           Text(
             formatted,
-            style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w700, color: _darkTxt),
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w700, color: context.colors.primaryText),
           ),
         ],
       ),
@@ -670,7 +908,7 @@ class _ProductCalculatorScreenState
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  totalWithGst > 0 ? AppColors.primaryRed : const Color(0xFFBDBDBD),
+                  totalWithGst > 0 ? AppColors.primaryRed : (context.isDarkMode ? const Color(0xFF424242) : const Color(0xFFBDBDBD)),
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -680,20 +918,36 @@ class _ProductCalculatorScreenState
                 ? () {
                     ref.read(estimateProvider.notifier).saveCurrentCalculatorItem(state);
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      backgroundColor: AppColors.deepRed,
+                      backgroundColor: context.isDarkMode
+                          ? context.colors.surfaceElevated
+                          : const Color(0xFF1F2937),
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                        side: context.isDarkMode
+                            ? BorderSide(color: context.colors.border, width: 1)
+                            : BorderSide.none,
+                      ),
                       content: Row(children: [
-                        const Icon(Icons.check_circle_rounded,
-                            color: Colors.white, size: 20),
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: context.isDarkMode
+                              ? const Color(0xFF81C784)
+                              : Colors.white,
+                          size: 20,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             isEditing
                                 ? '${state.product!.name} updated!'
                                 : '${state.product!.name} added to estimate!',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: context.isDarkMode
+                                  ? context.colors.primaryText
+                                  : Colors.white,
+                            ),
                           ),
                         ),
                       ]),
@@ -717,7 +971,7 @@ class _ProductCalculatorScreenState
         Text(
           disclaimer,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 10.5, color: _mutedTxt, height: 1.4),
+          style: TextStyle(fontSize: 10.5, color: context.colors.secondaryText, height: 1.4),
         ),
       ],
     );
@@ -731,15 +985,15 @@ class _ProductCalculatorScreenState
           text,
           style: TextStyle(
             fontSize: 11.5,
-            fontWeight: FontWeight.w600,
-            color: active ? AppColors.primaryRed : _mutedTxt,
+            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+            color: active ? context.colors.primaryText : context.colors.secondaryText,
           ),
         ),
       );
 
-  Widget _sep() => const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4),
-        child: Text('/', style: TextStyle(fontSize: 11.5, color: Color(0xFFD1D5DB))),
+  Widget _sep() => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text('/', style: TextStyle(fontSize: 11.5, color: context.colors.border)),
       );
 }
 
@@ -747,9 +1001,9 @@ class _ProductCalculatorScreenState
 class _Div extends StatelessWidget {
   const _Div();
   @override
-  Widget build(BuildContext context) => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Divider(height: 1, color: context.colors.border),
       );
 }
 

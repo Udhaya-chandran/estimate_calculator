@@ -33,20 +33,20 @@ class LivePreviewCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 18,
-                    color: AppColors.primaryRed,
+                    color: context.colors.primaryText,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Calculation Summary',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.darkRed,
+                      color: context.colors.primaryText,
                     ),
                   ),
                 ],
@@ -54,15 +54,15 @@ class LivePreviewCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.lightRed,
+                  color: context.colors.segmentedSelectedBg,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   '${result.calculatedQuantity.toStringAsFixed(2)} ${result.standardUnit}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primaryRed,
+                    color: context.colors.primaryText,
                   ),
                 ),
               ),
@@ -130,17 +130,20 @@ class LivePreviewCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    const Text(
+                    Text(
                       'Estimated Total',
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryText,
+                        color: context.colors.primaryText,
                       ),
                     ),
                     Text(
                       CurrencyFormatter.format(result.totalAmount),
-                      style: AppTextStyles.priceHighlight.copyWith(fontSize: 22),
+                      style: AppTextStyles.priceHighlight.copyWith(
+                        fontSize: 22,
+                        color: context.colors.primaryText,
+                      ),
                     ),
                   ],
                 ),

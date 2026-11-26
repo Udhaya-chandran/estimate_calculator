@@ -133,7 +133,10 @@ class CalculatorNotifier extends Notifier<CalculatorInputState> {
     } else {
       final config = product.measurementConfiguration;
       const defaultQty = 1;
-      final defaultLen = config.requiresLength ? 10.0 : null;
+      final defaultLen =
+          (config.requiresLength || product.categoryId == 'cat_pipes')
+              ? 10.0
+              : null;
       final defaultWidth = config.requiresWidth ? 10.0 : null;
       // For TMT-style weight-based: default weight derived from diameter variant
       // 6mm bar at 12m = D²/162 * L = 36/162 * 12 = 2.667 kg

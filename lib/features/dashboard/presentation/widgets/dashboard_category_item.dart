@@ -26,18 +26,18 @@ class DashboardCategoryItem extends StatelessWidget {
             child: Container(
               width: 48,
               height: 48,
-              color: const Color(0xFFF0F0F2),
+              color: context.colors.pillBg,
               child: category.imageUrl != null
                   ? Image.network(
                       category.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context),
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
-                        return _buildPlaceholder();
+                        return _buildPlaceholder(context);
                       },
                     )
-                  : _buildPlaceholder(),
+                  : _buildPlaceholder(context),
             ),
           ),
           const SizedBox(width: 14),
@@ -48,7 +48,10 @@ class DashboardCategoryItem extends StatelessWidget {
               children: [
                 Text(
                   category.name,
-                  style: AppTextStyles.titleSmall.copyWith(fontSize: 14),
+                  style: AppTextStyles.titleSmall.copyWith(
+                    fontSize: 14,
+                    color: context.colors.primaryText,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -56,16 +59,16 @@ class DashboardCategoryItem extends StatelessWidget {
                 Text(
                   '${category.productCount} products',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.secondaryText,
+                    color: context.colors.secondaryText,
                     fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(
+          Icon(
             Icons.chevron_right_rounded,
-            color: AppColors.secondaryText,
+            color: context.colors.secondaryText,
             size: 20,
           ),
         ],
@@ -73,9 +76,9 @@ class DashboardCategoryItem extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
-      color: AppColors.lightRed,
+      color: context.colors.lightRed,
       child: Center(
         child: Icon(
           category.icon,

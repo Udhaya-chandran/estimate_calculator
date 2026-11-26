@@ -4,7 +4,8 @@ class AppConstants {
   static const String appName = 'Saudi Steels';
   static const String shopName = 'Saudi Steels';
   static const String shopTagline = 'Building Material Hyper Market • Build with Confidence';
-  static const String logoAsset = 'assets/saudi_logo.jpg';
+  static const String logoAsset = 'assets/saudi_logo.png';
+  static const String logoDarkAsset = 'assets/saudi_logo_dark.png';
   static const String currencySymbol = '₹';
   static const String currencyCode = 'INR';
 

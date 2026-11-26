@@ -28,12 +28,12 @@ class CategoriesScreen extends ConsumerWidget {
         actions: [
           if (activeCount > 0)
             Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: const EdgeInsets.only(right: 4.0),
               child: IconButton(
                 icon: Badge(
                   label: Text('$activeCount'),
                   backgroundColor: AppColors.primaryRed,
-                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primaryText),
+                  child: Icon(Icons.shopping_cart_outlined, color: context.colors.primaryText),
                 ),
                 onPressed: () => context.push('/estimate-list'),
               ),
@@ -45,49 +45,61 @@ class CategoriesScreen extends ConsumerWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: AppColors.surface,
+            color: context.colors.surface,
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, size: 18, color: AppColors.secondaryText),
+                Icon(Icons.info_outline_rounded, size: 18, color: context.colors.secondaryText),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Choose a category to view materials and calculate costs.',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
+                    style: AppTextStyles.bodySmall.copyWith(color: context.colors.secondaryText),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: context.colors.border),
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 0.80,
-              ),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final cat = categories[index];
-                final isSelected = selectedCategoryId == cat.id;
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final crossAxisCount = width >= 900
+                    ? 4
+                    : (width >= 600 ? 3 : 2);
+                final childAspectRatio = width < 360
+                    ? 0.74
+                    : (width >= 900 ? 0.95 : (width >= 600 ? 0.88 : 0.80));
 
-                return CategoryCard(
-                  category: cat,
-                  isSelected: isSelected,
-                  onTap: () {
-                    ref.read(selectedCategoryIdProvider.notifier).select(cat.id);
-                    ref.read(selectedSubCategoryProvider.notifier).select(null);
-                    ref.read(productSearchQueryProvider.notifier).setQuery('');
-                    context.push('/products');
-                  },
-                  onSubCategoryTap: (subCat) {
-                    ref.read(selectedCategoryIdProvider.notifier).select(cat.id);
-                    ref.read(selectedSubCategoryProvider.notifier).select(subCat);
-                    ref.read(productSearchQueryProvider.notifier).setQuery('');
-                    context.push('/products');
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: childAspectRatio,
+                  ),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final cat = categories[index];
+                    final isSelected = selectedCategoryId == cat.id;
+
+                    return CategoryCard(
+                      category: cat,
+                      isSelected: isSelected,
+                      onTap: () {
+                        ref.read(selectedCategoryIdProvider.notifier).select(cat.id);
+                        ref.read(selectedSubCategoryProvider.notifier).select(null);
+                        ref.read(productSearchQueryProvider.notifier).setQuery('');
+                        context.push('/products');
+                      },
+                      onSubCategoryTap: (subCat) {
+                        ref.read(selectedCategoryIdProvider.notifier).select(cat.id);
+                        ref.read(selectedSubCategoryProvider.notifier).select(subCat);
+                        ref.read(productSearchQueryProvider.notifier).setQuery('');
+                        context.push('/products');
+                      },
+                    );
                   },
                 );
               },

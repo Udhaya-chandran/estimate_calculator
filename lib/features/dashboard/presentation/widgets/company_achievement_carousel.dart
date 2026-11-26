@@ -164,7 +164,7 @@ class _CompanyAchievementCarouselState extends State<CompanyAchievementCarousel>
               height: 5,
               width: isSelected ? 22 : 6,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryRed : AppColors.border,
+                color: isSelected ? AppColors.primaryRed : context.colors.border,
                 borderRadius: BorderRadius.circular(3),
               ),
             );
@@ -231,37 +231,44 @@ class _CompanyAchievementCarouselState extends State<CompanyAchievementCarousel>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          width: 0.8,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              item.icon,
+                              color: const Color(0xFFFFE082),
+                              size: 13,
+                            ),
+                            const SizedBox(width: 5),
+                            Flexible(
+                              child: Text(
+                                item.tag,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            item.icon,
-                            color: const Color(0xFFFFE082),
-                            size: 13,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            item.tag,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
+                    const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -317,21 +324,24 @@ class _CompanyAchievementCarouselState extends State<CompanyAchievementCarousel>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Stat 1 & Stat 2 Chips
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildStatChip(item.stat1Value, item.stat1Label),
-                        const SizedBox(width: 8),
-                        _buildStatChip(item.stat2Value, item.stat2Label),
-                      ],
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(child: _buildStatChip(item.stat1Value, item.stat1Label)),
+                          const SizedBox(width: 6),
+                          Flexible(child: _buildStatChip(item.stat2Value, item.stat2Label)),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 6),
 
                     // Quick Action Button
                     InkWell(
                       onTap: item.isPrimaryAction ? widget.onStartEstimate : widget.onBrowseCategories,
                       borderRadius: BorderRadius.circular(8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -376,7 +386,7 @@ class _CompanyAchievementCarouselState extends State<CompanyAchievementCarousel>
 
   Widget _buildStatChip(String value, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(6),
@@ -385,19 +395,24 @@ class _CompanyAchievementCarouselState extends State<CompanyAchievementCarousel>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.75),
-              fontSize: 8.5,
+              fontSize: 8,
             ),
           ),
         ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
-import '../../app/theme/app_text_styles.dart';
 import 'custom_button.dart';
 
 class EmptyStateView extends StatelessWidget {
@@ -32,9 +31,9 @@ class EmptyStateView extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.lightRed,
+                color: context.colors.lightRed,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primaryRed.withValues(alpha: 0.2), width: 2),
+                border: Border.all(color: AppColors.primaryRed.withValues(alpha: 0.25), width: 2),
               ),
               child: Icon(
                 icon,
@@ -46,13 +45,22 @@ class EmptyStateView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: AppTextStyles.titleMedium.copyWith(fontSize: 18),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: context.colors.primaryText,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               description,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: context.colors.secondaryText,
+                height: 1.4,
+              ),
             ),
             if (buttonText != null && onButtonPressed != null) ...[
               const SizedBox(height: 24),
@@ -68,4 +76,3 @@ class EmptyStateView extends StatelessWidget {
     );
   }
 }
-

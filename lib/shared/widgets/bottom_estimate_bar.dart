@@ -36,16 +36,16 @@ class BottomEstimateBar extends StatelessWidget {
         bottom: 10 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: context.isDarkMode ? 0.35 : 0.08),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
         ],
-        border: const Border(
-          top: BorderSide(color: AppColors.border, width: 1),
+        border: Border(
+          top: BorderSide(color: context.colors.border, width: 1),
         ),
       ),
       child: LayoutBuilder(
@@ -62,26 +62,26 @@ class BottomEstimateBar extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.lightRed,
+                        color: context.colors.segmentedSelectedBg,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primaryRed,
+                          color: context.colors.primaryText,
                         ),
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'ESTIMATED TOTAL',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.secondaryText,
+                          color: context.colors.secondaryText,
                           letterSpacing: 0.4,
                         ),
                         maxLines: 1,
@@ -94,7 +94,10 @@ class BottomEstimateBar extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: Text(
                         CurrencyFormatter.format(totalAmount),
-                        style: AppTextStyles.priceHighlight.copyWith(fontSize: 18),
+                        style: AppTextStyles.priceHighlight.copyWith(
+                          fontSize: 18,
+                          color: context.colors.primaryText,
+                        ),
                       ),
                     ),
                   ],
@@ -147,26 +150,26 @@ class BottomEstimateBar extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.lightRed,
+                            color: context.colors.segmentedSelectedBg,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.primaryRed,
+                              color: context.colors.primaryText,
                             ),
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Flexible(
+                        Flexible(
                           child: Text(
                             'ESTIMATED TOTAL',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.secondaryText,
+                              color: context.colors.secondaryText,
                               letterSpacing: 0.5,
                             ),
                             maxLines: 1,
@@ -181,7 +184,10 @@ class BottomEstimateBar extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         CurrencyFormatter.format(totalAmount),
-                        style: AppTextStyles.priceHighlight.copyWith(fontSize: 22),
+                        style: AppTextStyles.priceHighlight.copyWith(
+                          fontSize: 22,
+                          color: context.colors.primaryText,
+                        ),
                       ),
                     ),
                   ],

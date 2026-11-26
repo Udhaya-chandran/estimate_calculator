@@ -23,8 +23,8 @@ class CategoryCard extends StatelessWidget {
     return CustomCard(
       onTap: onTap,
       padding: EdgeInsets.zero,
-      backgroundColor: isSelected ? AppColors.lightRed : AppColors.surface,
-      borderColor: isSelected ? AppColors.primaryRed : AppColors.border,
+      backgroundColor: isSelected ? context.colors.lightRed : context.colors.surface,
+      borderColor: isSelected ? AppColors.primaryRed : context.colors.border,
       borderRadius: 14,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,16 +38,16 @@ class CategoryCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Container(
-                    color: const Color(0xFFF0F0F2),
+                    color: context.colors.pillBg,
                     child: category.imageUrl != null
                         ? Image.network(
                             category.imageUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context),
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return Container(
-                                color: const Color(0xFFF5F5F5),
+                                color: context.colors.pillBg,
                                 child: const Center(
                                   child: SizedBox(
                                     width: 18,
@@ -61,7 +61,7 @@ class CategoryCard extends StatelessWidget {
                               );
                             },
                           )
-                        : _buildPlaceholder(),
+                        : _buildPlaceholder(context),
                   ),
                   // Subtle gradient overlay
                   Positioned.fill(
@@ -86,7 +86,11 @@ class CategoryCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryRed : Colors.white.withValues(alpha: 0.92),
+                        color: isSelected
+                            ? AppColors.primaryRed
+                            : (context.isDarkMode
+                                ? context.colors.surfaceElevated
+                                : Colors.white.withValues(alpha: 0.92)),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -114,7 +118,9 @@ class CategoryCard extends StatelessWidget {
                   Text(
                     category.name,
                     style: AppTextStyles.titleSmall.copyWith(
-                      color: isSelected ? AppColors.darkRed : AppColors.primaryText,
+                      color: isSelected
+                          ? (context.isDarkMode ? Colors.white : AppColors.darkRed)
+                          : context.colors.primaryText,
                       fontWeight: FontWeight.w800,
                       fontSize: 13.5,
                     ),
@@ -126,8 +132,8 @@ class CategoryCard extends StatelessWidget {
                   if (category.subtitle != null)
                     Text(
                       category.subtitle!,
-                      style: const TextStyle(
-                        color: AppColors.secondaryText,
+                      style: TextStyle(
+                        color: context.colors.secondaryText,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w500,
                         height: 1.15,
@@ -150,10 +156,10 @@ class CategoryCard extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF4F4F6),
+                                  color: context.colors.pillBg,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: const Color(0xFFE2E2E6),
+                                    color: context.colors.pillBorder,
                                     width: 1,
                                   ),
                                 ),
@@ -162,10 +168,10 @@ class CategoryCard extends StatelessWidget {
                                   children: [
                                     Text(
                                       entry.key,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.primaryText,
+                                        color: context.colors.primaryText,
                                       ),
                                     ),
                                     const SizedBox(width: 3),
@@ -194,9 +200,9 @@ class CategoryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
-      color: AppColors.lightRed.withValues(alpha: 0.5),
+      color: context.colors.lightRed,
       child: Center(
         child: Icon(
           category.icon,

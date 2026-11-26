@@ -1,3 +1,4 @@
+import 'package:estimate_calculator/features/calculator/domain/services/calculation_service.dart';
 import 'package:estimate_calculator/features/calculator/presentation/providers/calculator_provider.dart';
 import '../../../../shared/models/product.dart';
 import '../../domain/entities/product_variant.dart';
@@ -43,6 +44,29 @@ class ProductCalculationHelper {
     return null;
   }
 
+  static double _optionDelta(
+      ProductVariantConfig? vc, CalculatorInputState state, String keyword) {
+    if (vc == null) return 0.0;
+    for (final g in vc.variantGroups) {
+      if (g.title.toLowerCase().contains(keyword.toLowerCase()) &&
+          g.options.isNotEmpty) {
+        final baseRate = g.options.first.rate;
+        final idx = state.selectedVariantIndices[g.title] ?? 0;
+        if (idx >= 0 &&
+            idx < g.options.length &&
+            baseRate > 0 &&
+            g.options[idx].rate > 0) {
+          return g.options[idx].rate - baseRate;
+        }
+      }
+    }
+    return 0.0;
+  }
+
+  static double _brandDelta(
+          ProductVariantConfig? vc, CalculatorInputState state) =>
+      _optionDelta(vc, state, 'brand');
+
   static ProductCalculationInfo calculate(
       CalculatorInputState state, Product product) {
     final vc = product.variantConfig;
@@ -66,8 +90,10 @@ class ProductCalculationHelper {
       return _calculateRoofing(state, product, vc, gstPct, qty);
     } else if (isPipe) {
       return _calculatePipe(state, product, vc, gstPct, qty);
-    } else {
+    } else if (catId == 'cat_steel') {
       return _calculateSteel(state, product, vc, gstPct, qty);
+    } else {
+      return _calculateGeneric(state, product, vc, gstPct, qty);
     }
   }
 
@@ -100,9 +126,14 @@ class ProductCalculationHelper {
     final gstAmt = baseTotal * gstPct / 100;
     final totalWithGst = baseTotal + gstAmt;
 
-    final breakdownQtyText = selUnit == 'Tonnes' && qty > 1
-        ? '${bagsCount.toInt()} bags ($qty tonnes)'
-        : '${bagsCount.toInt()} bags';
+    final kgPerBag = (1000.0 / unitsPerTonne).round();
+    final totalKg = (bagsCount * kgPerBag).round();
+    final kgStr = totalKg.toString().replaceAllMapped(
+        RegExp(r'(\d+?)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+
+    final breakdownQtyText = selUnit == 'Tonnes'
+        ? '$qty ${qty == 1 ? 'tonne' : 'tonnes'} (${bagsCount.toInt()} bags · $kgStr kg)'
+        : '${bagsCount.toInt()} ${bagsCount.toInt() == 1 ? 'bag' : 'bags'} ($kgStr kg)';
 
     return ProductCalculationInfo(
       baseTotal: baseTotal,
@@ -137,11 +168,12 @@ class ProductCalculationHelper {
       final widthOpt = _getOpt(vc, state, 'width');
       final lengthOpt = _getOpt(vc, state, 'length');
 
-      final double ratePerSqFt = (profileOpt != null && profileOpt.rate > 0)
-          ? profileOpt.rate
-          : ((brandOpt != null && brandOpt.rate > 0)
-              ? brandOpt.rate
-              : (state.customRate > 0 ? state.customRate : 110.0));
+      final double ratePerSqFt = ((profileOpt != null && profileOpt.rate > 0)
+              ? profileOpt.rate + _brandDelta(vc, state)
+              : ((brandOpt != null && brandOpt.rate > 0)
+                  ? brandOpt.rate
+                  : (state.customRate > 0 ? state.customRate : 110.0)))
+          .clamp(1.0, double.infinity);
 
       double widthFt = 3.0;
       if (widthOpt != null && widthOpt.detail != null) {
@@ -204,11 +236,12 @@ class ProductCalculationHelper {
     final widthOpt = _getOpt(vc, state, 'width');
     final lengthOpt = _getOpt(vc, state, 'length');
 
-    final double ratePerKg = (zincOpt != null && zincOpt.rate > 0)
-        ? zincOpt.rate
-        : ((brandOpt != null && brandOpt.rate > 0)
-            ? brandOpt.rate
-            : (state.customRate > 0 ? state.customRate : product.rate));
+    final double ratePerKg = ((zincOpt != null && zincOpt.rate > 0)
+            ? zincOpt.rate + _brandDelta(vc, state)
+            : ((brandOpt != null && brandOpt.rate > 0)
+                ? brandOpt.rate
+                : (state.customRate > 0 ? state.customRate : product.rate)))
+        .clamp(1.0, double.infinity);
 
     double thicknessMm = 0.47;
     if (thickOpt != null) {
@@ -327,87 +360,14 @@ class ProductCalculationHelper {
     double gstPct,
     int qty,
   ) {
-    final isSSPipe = product.id == 'prod_ss_pipe';
+    final isPlasticPipe =
+        product.id == 'prod_pvc_pipe' || product.id == 'prod_cpvc_pipe';
 
-    if (isSSPipe) {
-      final gradeOpt = _getOpt(vc, state, 'grade');
-      final sizeOpt = _getOpt(vc, state, 'size') ?? _getOpt(vc, state, 'diameter');
-      final lengthOpt = _getOpt(vc, state, 'length');
-
-      double gradeMultiplier = 1.0;
-      if (gradeOpt != null) {
-        if (gradeOpt.label.contains('304')) {
-          gradeMultiplier = 285.0 / 173.16;
-        } else if (gradeOpt.label.contains('316')) {
-          gradeMultiplier = 519.75 / 173.16;
-        }
-      }
-
-      final double baseSizeRate = (sizeOpt != null && sizeOpt.rate > 0)
-          ? sizeOpt.rate
-          : ((gradeOpt != null && gradeOpt.rate > 0)
-              ? gradeOpt.rate
-              : (state.customRate > 0 ? state.customRate : 173.16));
-      final double ratePerMetre = baseSizeRate * gradeMultiplier;
-
-      double lengthInM = 6.0;
-      if (lengthOpt != null) {
-        if (lengthOpt.detail != null &&
-            double.tryParse(lengthOpt.detail!) != null) {
-          lengthInM = double.parse(lengthOpt.detail!);
-        } else {
-          final match =
-              RegExp(r'([0-9]+\.?[0-9]*)').firstMatch(lengthOpt.label);
-          if (match != null) {
-            lengthInM = double.tryParse(match.group(1)!) ?? 6.0;
-          }
-        }
-      }
-
-      final double ratePerNos = ratePerMetre * lengthInM;
-
-      final orderUnits = vc?.orderUnitLabels ?? const ['Metre', 'Nos'];
-      final safeUnitIdx = (state.orderUnitIndex < orderUnits.length)
-          ? state.orderUnitIndex
-          : 0;
-      final selUnit = orderUnits[safeUnitIdx].toLowerCase();
-
-      double baseTotal;
-      String breakdownText;
-      if (selUnit.contains('nos') || selUnit.contains('piece')) {
-        baseTotal = qty * ratePerNos;
-        breakdownText =
-            '$qty nos (${lengthInM == lengthInM.roundToDouble() ? lengthInM.toInt() : lengthInM} m)';
-      } else {
-        baseTotal = qty * ratePerMetre;
-        breakdownText = '$qty m';
-      }
-
-      final double gstAmt = baseTotal * gstPct / 100;
-      final double totalWithGst = baseTotal + gstAmt;
-
-      final rateMetreFormatted = ratePerMetre == ratePerMetre.roundToDouble()
-          ? ratePerMetre.toInt().toString()
-          : ratePerMetre.toStringAsFixed(2);
-
-      return ProductCalculationInfo(
-        baseTotal: baseTotal,
-        gstPercent: gstPct,
-        gstAmount: gstAmt,
-        totalWithGst: totalWithGst,
-        appliedRate: ratePerMetre,
-        appliedRateUnit: 'Metre',
-        headerRateString: 'rate ₹$rateMetreFormatted/metre',
-        breakdownItemText: product.name,
-        breakdownQtyText: breakdownText,
-        rateCard: [
-          MapEntry('per Metre', ratePerMetre),
-          MapEntry('per Nos', ratePerNos),
-        ],
-      );
+    if (!isPlasticPipe) {
+      return _calculateMetalPipe(state, product, vc, gstPct, qty);
     }
 
-    // Other pipes: GI round, GI square/rect, MS square, PVC, CPVC
+    // Plastic pipes (PVC / CPVC): length-based pricing
     final sizeOpt = _getOpt(vc, state, 'size');
     final classOpt = _getOpt(vc, state, 'class') ??
         _getOpt(vc, state, 'pressure') ??
@@ -415,20 +375,30 @@ class ProductCalculationHelper {
     final brandOpt = _getOpt(vc, state, 'brand');
     final lengthOpt = _getOpt(vc, state, 'length');
 
-    final double ratePerFoot = (sizeOpt != null && sizeOpt.rate > 0)
-        ? sizeOpt.rate
-        : ((classOpt != null && classOpt.rate > 0)
-            ? classOpt.rate
-            : ((brandOpt != null && brandOpt.rate > 0)
-                ? brandOpt.rate
-                : (state.customRate > 0 ? state.customRate : product.rate)));
+    final double classDelta = _optionDelta(vc, state, 'class');
+    final double ratePerFoot = ((sizeOpt != null && sizeOpt.rate > 0)
+            ? sizeOpt.rate + _brandDelta(vc, state) + classDelta
+            : ((classOpt != null && classOpt.rate > 0)
+                ? classOpt.rate + _brandDelta(vc, state)
+                : ((brandOpt != null && brandOpt.rate > 0)
+                    ? brandOpt.rate
+                    : (state.customRate > 0 ? state.customRate : product.rate))))
+        .clamp(1.0, double.infinity);
 
     final double ratePerMetre = ratePerFoot * 3.28084;
 
     double lengthInM = 6.10;
     double lengthInFt = 20.0;
+    bool isCutToLength = false;
     if (lengthOpt != null) {
-      if (lengthOpt.detail != null &&
+      if (lengthOpt.detail == 'custom' ||
+          lengthOpt.label.toLowerCase().contains('cut')) {
+        isCutToLength = true;
+        lengthInFt = (state.length != null && state.length! > 0)
+            ? state.length!
+            : 0.0;
+        lengthInM = lengthInFt * 0.3048;
+      } else if (lengthOpt.detail != null &&
           double.tryParse(lengthOpt.detail!) != null) {
         lengthInM = double.parse(lengthOpt.detail!);
         lengthInFt = lengthInM / 0.3048;
@@ -453,7 +423,14 @@ class ProductCalculationHelper {
 
     double baseTotal;
     String breakdownText;
-    if (selUnit.contains('nos') || selUnit.contains('piece')) {
+    if (isCutToLength) {
+      baseTotal = qty * ratePerNos;
+      final ftStr = lengthInFt == lengthInFt.roundToDouble()
+          ? lengthInFt.toInt().toString()
+          : lengthInFt.toStringAsFixed(1);
+      breakdownText =
+          '$qty ${qty == 1 ? 'cut' : 'cuts'} ($ftStr ft / ${lengthInM.toStringAsFixed(2)} m)';
+    } else if (selUnit.contains('nos') || selUnit.contains('piece')) {
       baseTotal = qty * ratePerNos;
       breakdownText =
           '$qty nos (${lengthInFt.toInt()} ft / ${lengthInM.toStringAsFixed(1)} m)';
@@ -490,6 +467,132 @@ class ProductCalculationHelper {
     );
   }
 
+  /// Weight-based calculation for Metal Pipes (SS, MS Square, GI Round, GI Square/Rect)
+  /// based on Size (OD or WxH), Gauge/Class wall thickness, and Length (including Cut to length).
+  static ProductCalculationInfo _calculateMetalPipe(
+    CalculatorInputState state,
+    Product product,
+    ProductVariantConfig? vc,
+    double gstPct,
+    int qty,
+  ) {
+    final brandOpt = _getOpt(vc, state, 'brand');
+    final gradeOpt = _getOpt(vc, state, 'grade');
+    final gaugeOpt = _getOpt(vc, state, 'gauge') ?? _getOpt(vc, state, 'class');
+    final sizeOpt = _getOpt(vc, state, 'size');
+    final lengthOpt = _getOpt(vc, state, 'length');
+
+    // 1. Rate per kg (Grade for SS pipe, Brand for MS/GI pipes)
+    final double ratePerKg = (product.id == 'prod_ss_pipe' &&
+            gradeOpt != null &&
+            gradeOpt.rate > 0)
+        ? gradeOpt.rate
+        : ((brandOpt != null && brandOpt.rate > 0)
+            ? brandOpt.rate
+            : (state.customRate > 0 ? state.customRate : product.rate));
+
+    // 2. Wall thickness (mm) from Gauge / Class
+    double thicknessMm = 1.6;
+    if (gaugeOpt != null) {
+      if (gaugeOpt.detail != null &&
+          double.tryParse(gaugeOpt.detail!) != null) {
+        thicknessMm = double.parse(gaugeOpt.detail!);
+      } else {
+        final m = RegExp(r'([0-9]+\.?[0-9]*)\s*mm').firstMatch(gaugeOpt.label);
+        if (m != null) {
+          thicknessMm = double.tryParse(m.group(1)!) ?? 1.6;
+        }
+      }
+    }
+
+    // 3. Theoretical weight per metre (kg/m) from cross-section & thickness
+    final double kgPerMetre;
+    if (product.id == 'prod_ss_pipe' ||
+        product.id == 'prod_gi_round_1inch' ||
+        product.id == 'prod_gi_round_2inch') {
+      double odMm = product.id == 'prod_gi_round_2inch'
+          ? 60.3
+          : (product.id == 'prod_gi_round_1inch' ? 33.7 : 21.3);
+      if (sizeOpt?.detail != null &&
+          double.tryParse(sizeOpt!.detail!) != null) {
+        odMm = double.parse(sizeOpt.detail!);
+      }
+      final factor = product.id == 'prod_ss_pipe' ? 0.02491 : 0.02466;
+      kgPerMetre = ((odMm - thicknessMm) * thicknessMm * factor)
+          .clamp(0.0, double.infinity);
+    } else if (product.id == 'prod_gi_rect_2x1') {
+      const double wMm = 50.0;
+      const double hMm = 25.0;
+      kgPerMetre = ((wMm + hMm - 2 * thicknessMm) * thicknessMm * 0.0157)
+          .clamp(0.0, double.infinity);
+    } else {
+      // Square pipes: MS Square, GI Square 1x1, GI Square 2x2
+      double sideMm = product.id == 'prod_gi_sq_2x2' ? 50.0 : 25.0;
+      if (sizeOpt?.detail != null &&
+          double.tryParse(sizeOpt!.detail!) != null) {
+        sideMm = double.parse(sizeOpt.detail!);
+      }
+      kgPerMetre = ((sideMm - thicknessMm) * thicknessMm * 0.0314)
+          .clamp(0.0, double.infinity);
+    }
+
+    // 4. Length in metres & feet (supports standard lengths and custom Cut to length)
+    double lengthInM = 6.10;
+    double lengthInFt = 20.0;
+    bool isCutToLength = false;
+    if (lengthOpt != null) {
+      if (lengthOpt.detail == 'custom' ||
+          lengthOpt.label.toLowerCase().contains('cut')) {
+        isCutToLength = true;
+        lengthInFt = (state.length != null && state.length! > 0)
+            ? state.length!
+            : 0.0;
+        lengthInM = lengthInFt * 0.3048;
+      } else if (lengthOpt.detail != null &&
+          double.tryParse(lengthOpt.detail!) != null) {
+        lengthInM = double.parse(lengthOpt.detail!);
+        lengthInFt = lengthInM / 0.3048;
+      }
+    }
+
+    // 5. Weight & Price calculation
+    final double weightPerPieceKg = kgPerMetre * lengthInM;
+    final double totalWeightKg = qty * weightPerPieceKg;
+    final double baseTotal = totalWeightKg * ratePerKg;
+    final double gstAmt = baseTotal * gstPct / 100;
+    final double totalWithGst = baseTotal + gstAmt;
+
+    final rateKgFormatted = ratePerKg == ratePerKg.roundToDouble()
+        ? ratePerKg.toInt().toString()
+        : ratePerKg.toStringAsFixed(2);
+
+    final ftStr = lengthInFt == lengthInFt.roundToDouble()
+        ? lengthInFt.toInt().toString()
+        : lengthInFt.toStringAsFixed(1);
+
+    final String breakdownQtyText = isCutToLength
+        ? '$qty ${qty == 1 ? 'cut' : 'cuts'} × ${totalWeightKg.toStringAsFixed(2)} kg ($ftStr ft / ${lengthInM.toStringAsFixed(2)} m)'
+        : '$qty nos × ${totalWeightKg.toStringAsFixed(2)} kg (${lengthInM.toStringAsFixed(2)} m)';
+
+    return ProductCalculationInfo(
+      baseTotal: baseTotal,
+      gstPercent: gstPct,
+      gstAmount: gstAmt,
+      totalWithGst: totalWithGst,
+      appliedRate: ratePerKg,
+      appliedRateUnit: 'Kg',
+      headerRateString: 'rate ₹$rateKgFormatted/kg',
+      breakdownItemText: product.name,
+      breakdownQtyText: breakdownQtyText,
+      rateCard: [
+        MapEntry('per Kg', ratePerKg),
+        MapEntry('per Nos', weightPerPieceKg * ratePerKg),
+        MapEntry('per Metre', kgPerMetre * ratePerKg),
+        MapEntry('per Tonne', ratePerKg * 1000),
+      ],
+    );
+  }
+
   // ──────────────────────────── 4. STEEL ────────────────────────────
   static ProductCalculationInfo _calculateSteel(
     CalculatorInputState state,
@@ -503,11 +606,12 @@ class ProductCalculationHelper {
       final gaugeOpt = _getOpt(vc, state, 'gauge') ?? _getOpt(vc, state, 'mesh');
       final rollOpt = _getOpt(vc, state, 'roll');
 
-      final double ratePerSqFt = (gaugeOpt != null && gaugeOpt.rate > 0)
-          ? gaugeOpt.rate
-          : ((brandOpt != null && brandOpt.rate > 0)
-              ? brandOpt.rate
-              : (state.customRate > 0 ? state.customRate : 35.0));
+      final double ratePerSqFt = ((gaugeOpt != null && gaugeOpt.rate > 0)
+              ? gaugeOpt.rate + _brandDelta(vc, state)
+              : ((brandOpt != null && brandOpt.rate > 0)
+                  ? brandOpt.rate
+                  : (state.customRate > 0 ? state.customRate : 35.0)))
+          .clamp(1.0, double.infinity);
 
       double rollSqFt = 200.0;
       if (rollOpt != null && rollOpt.detail != null) {
@@ -562,11 +666,12 @@ class ProductCalculationHelper {
       final thickOpt = _getOpt(vc, state, 'thick');
       final sizeOpt = _getOpt(vc, state, 'size');
 
-      final double ratePerKg = (thickOpt != null && thickOpt.rate > 0)
-          ? thickOpt.rate
-          : ((brandOpt != null && brandOpt.rate > 0)
-              ? brandOpt.rate
-              : (state.customRate > 0 ? state.customRate : 75.0));
+      final double ratePerKg = ((thickOpt != null && thickOpt.rate > 0)
+              ? thickOpt.rate + _brandDelta(vc, state)
+              : ((brandOpt != null && brandOpt.rate > 0)
+                  ? brandOpt.rate
+                  : (state.customRate > 0 ? state.customRate : 75.0)))
+          .clamp(1.0, double.infinity);
 
       double thicknessMm = 6.0;
       if (thickOpt != null) {
@@ -640,11 +745,12 @@ class ProductCalculationHelper {
       final sizeOpt = _getOpt(vc, state, 'size');
       final lengthOpt = _getOpt(vc, state, 'length');
 
-      final double ratePerKg = (sizeOpt != null && sizeOpt.rate > 0)
-          ? sizeOpt.rate
-          : ((brandOpt != null && brandOpt.rate > 0)
-              ? brandOpt.rate
-              : (state.customRate > 0 ? state.customRate : 80.0));
+      final double ratePerKg = ((sizeOpt != null && sizeOpt.rate > 0)
+              ? sizeOpt.rate + _brandDelta(vc, state)
+              : ((brandOpt != null && brandOpt.rate > 0)
+                  ? brandOpt.rate
+                  : (state.customRate > 0 ? state.customRate : 80.0)))
+          .clamp(1.0, double.infinity);
 
       double kgPerMetre = 2.97;
       if (sizeOpt != null && sizeOpt.detail != null) {
@@ -725,11 +831,12 @@ class ProductCalculationHelper {
     final diamOpt = _getOpt(vc, state, 'diam') ?? _getOpt(vc, state, 'size');
     final lengthOpt = _getOpt(vc, state, 'length');
 
-    final double ratePerKg = (diamOpt != null && diamOpt.rate > 0)
-        ? diamOpt.rate
-        : ((brandOpt != null && brandOpt.rate > 0)
-            ? brandOpt.rate
-            : (state.customRate > 0 ? state.customRate : 76.0));
+    final double ratePerKg = ((diamOpt != null && diamOpt.rate > 0)
+            ? diamOpt.rate + _brandDelta(vc, state)
+            : ((brandOpt != null && brandOpt.rate > 0)
+                ? brandOpt.rate
+                : (state.customRate > 0 ? state.customRate : 76.0)))
+        .clamp(1.0, double.infinity);
 
     double diamMm = 6.0;
     if (diamOpt != null) {
@@ -804,6 +911,54 @@ class ProductCalculationHelper {
         MapEntry('per Metre', ratePerMetre),
         MapEntry('per Kg', ratePerKg),
         MapEntry('per Tonnes', ratePerTonne),
+      ],
+    );
+  }
+
+  // ──────────────────────────── 5. GENERIC (Sanitary, Hardware, Tiles) ─────
+  static ProductCalculationInfo _calculateGeneric(
+    CalculatorInputState state,
+    Product product,
+    ProductVariantConfig? vc,
+    double gstPct,
+    int qty,
+  ) {
+    final config = product.measurementConfiguration;
+    final rate = state.customRate > 0 ? state.customRate : product.rate;
+    const service = CalculationService();
+    final res = service.calculate(
+      product: product,
+      quantity: qty,
+      length: state.length ?? (config.requiresLength ? 10.0 : null),
+      lengthUnit: state.lengthUnit,
+      width: state.width ?? (config.requiresWidth ? 10.0 : null),
+      widthUnit: state.widthUnit,
+      weight: state.weight,
+      weightUnit: state.weightUnit,
+      rate: rate,
+    );
+
+    final baseTotal = res.totalAmount;
+    final gstAmt = baseTotal * gstPct / 100;
+    final totalWithGst = baseTotal + gstAmt;
+
+    final rateFormatted = rate == rate.roundToDouble()
+        ? rate.toInt().toString()
+        : rate.toStringAsFixed(2);
+    final unitLabel = product.pricingUnit;
+
+    return ProductCalculationInfo(
+      baseTotal: baseTotal,
+      gstPercent: gstPct,
+      gstAmount: gstAmt,
+      totalWithGst: totalWithGst,
+      appliedRate: rate,
+      appliedRateUnit: unitLabel,
+      headerRateString: 'rate ₹$rateFormatted/$unitLabel',
+      breakdownItemText: product.name,
+      breakdownQtyText: '$qty $unitLabel',
+      rateCard: [
+        MapEntry('per $unitLabel', rate),
       ],
     );
   }

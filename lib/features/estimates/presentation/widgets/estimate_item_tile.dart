@@ -31,14 +31,14 @@ class EstimateItemTile extends StatelessWidget {
                 child: Container(
                   width: 38,
                   height: 38,
-                  color: const Color(0xFFF0F0F2),
+                  color: context.colors.pillBg,
                   child: item.product.imageUrl != null
                       ? Image.network(
                           item.product.imageUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context),
                         )
-                      : _buildPlaceholder(),
+                      : _buildPlaceholder(context),
                 ),
               ),
               const SizedBox(width: 10),
@@ -48,20 +48,20 @@ class EstimateItemTile extends StatelessWidget {
                   children: [
                     Text(
                       item.product.brand.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryRed,
+                        color: context.colors.secondaryText,
                         letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 1),
                     Text(
                       item.product.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryText,
+                        color: context.colors.primaryText,
                       ),
                     ),
                   ],
@@ -71,7 +71,7 @@ class EstimateItemTile extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.secondaryText),
+                    icon: Icon(Icons.edit_outlined, size: 18, color: context.colors.secondaryText),
                     tooltip: 'Edit item',
                     splashRadius: 16,
                     padding: const EdgeInsets.all(6),
@@ -96,47 +96,47 @@ class EstimateItemTile extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: context.colors.pillBg,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               item.breakdown,
-              style: const TextStyle(
-                color: AppColors.primaryText,
+              style: TextStyle(
+                color: context.colors.primaryText,
                 fontWeight: FontWeight.w500,
                 fontSize: 11,
               ),
             ),
           ),
           const SizedBox(height: 8),
-          const Divider(height: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, color: context.colors.borderSubtle),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Rate: ${CurrencyFormatter.formatRate(item.rateSnapshot, item.product.pricingUnit)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.secondaryText,
+                  color: context.colors.secondaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Amount: ',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.secondaryText,
+                      color: context.colors.secondaryText,
                     ),
                   ),
                   Text(
                     CurrencyFormatter.format(item.totalAmount),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.primaryRed,
+                      color: context.colors.primaryText,
                     ),
                   ),
                 ],
@@ -148,9 +148,9 @@ class EstimateItemTile extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
-      color: AppColors.lightRed,
+      color: context.colors.lightRed,
       child: Center(
         child: Icon(
           item.product.icon ?? Icons.category_outlined,

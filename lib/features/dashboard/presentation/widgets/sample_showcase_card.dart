@@ -34,16 +34,16 @@ class SampleShowcaseCard extends StatelessWidget {
                   Container(
                     height: 95,
                     width: double.infinity,
-                    color: const Color(0xFFF0F0F2),
+                    color: context.colors.pillBg,
                     child: product.imageUrl != null
                         ? Image.network(
                             product.imageUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context),
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return Container(
-                                color: const Color(0xFFEEEEEE),
+                                color: context.colors.pillBg,
                                 child: const Center(
                                   child: SizedBox(
                                     width: 18,
@@ -57,7 +57,7 @@ class SampleShowcaseCard extends StatelessWidget {
                               );
                             },
                           )
-                        : _buildPlaceholder(),
+                        : _buildPlaceholder(context),
                   ),
                   Positioned(
                     top: 6,
@@ -95,10 +95,10 @@ class SampleShowcaseCard extends StatelessWidget {
                       product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryText,
+                        color: context.colors.primaryText,
                         height: 1.2,
                       ),
                     ),
@@ -111,16 +111,19 @@ class SampleShowcaseCard extends StatelessWidget {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               CurrencyFormatter.format(product.rate),
-                              style: AppTextStyles.priceMedium.copyWith(fontSize: 13.5),
+                              style: AppTextStyles.priceMedium.copyWith(
+                                fontSize: 13.5,
+                                color: context.colors.primaryText,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 3),
                         Text(
                           '/ ${product.pricingUnit}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 9.5,
-                            color: AppColors.secondaryText,
+                            color: context.colors.secondaryText,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -131,9 +134,10 @@ class SampleShowcaseCard extends StatelessWidget {
                       height: 28,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.lightRed,
-                          foregroundColor: AppColors.primaryRed,
+                          backgroundColor: context.colors.pillBg,
+                          foregroundColor: context.colors.primaryText,
                           elevation: 0,
+                          side: BorderSide(color: context.colors.pillBorder, width: 1),
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(7),
@@ -160,9 +164,9 @@ class SampleShowcaseCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
-      color: AppColors.lightRed.withValues(alpha: 0.6),
+      color: context.colors.lightRed,
       child: Center(
         child: Icon(
           product.icon ?? Icons.category_outlined,

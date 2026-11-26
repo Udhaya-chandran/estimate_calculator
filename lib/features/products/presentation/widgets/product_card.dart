@@ -31,16 +31,16 @@ class ProductCard extends StatelessWidget {
                 child: Container(
                   width: 52,
                   height: 52,
-                  color: const Color(0xFFF0F0F2),
+                  color: context.colors.pillBg,
                   child: product.imageUrl != null
                       ? Image.network(
                           product.imageUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context),
                           loadingBuilder: (context, child, progress) {
                             if (progress == null) return child;
                             return Container(
-                              color: const Color(0xFFEEEEEE),
+                              color: context.colors.pillBg,
                               child: const Center(
                                 child: SizedBox(
                                   width: 14,
@@ -54,7 +54,7 @@ class ProductCard extends StatelessWidget {
                             );
                           },
                         )
-                      : _buildPlaceholder(),
+                      : _buildPlaceholder(context),
                 ),
               ),
               const SizedBox(width: 10),
@@ -66,10 +66,10 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Text(
                           product.brand.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primaryRed,
+                            color: context.colors.secondaryText,
                             letterSpacing: 0.6,
                           ),
                         ),
@@ -80,10 +80,10 @@ class ProductCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       product.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryText,
+                        color: context.colors.primaryText,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -97,8 +97,8 @@ class ProductCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               product.description!,
-              style: const TextStyle(
-                color: AppColors.secondaryText,
+              style: TextStyle(
+                color: context.colors.secondaryText,
                 height: 1.3,
                 fontSize: 11,
               ),
@@ -107,7 +107,7 @@ class ProductCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 8),
-          const Divider(height: 1, color: AppColors.borderSubtle),
+          Divider(height: 1, color: context.colors.borderSubtle),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,11 +116,11 @@ class ProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Rate / Unit',
                       style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.secondaryText,
+                        color: context.colors.secondaryText,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -130,17 +130,17 @@ class ProductCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: CurrencyFormatter.format(product.rate),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primaryText,
+                              color: context.colors.primaryText,
                             ),
                           ),
                           TextSpan(
                             text: ' / ${product.pricingUnit}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.secondaryText,
+                              color: context.colors.secondaryText,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -152,9 +152,10 @@ class ProductCard extends StatelessWidget {
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lightRed,
-                  foregroundColor: AppColors.primaryRed,
+                  backgroundColor: context.colors.pillBg,
+                  foregroundColor: context.colors.primaryText,
                   elevation: 0,
+                  side: BorderSide(color: context.colors.pillBorder, width: 1),
                   padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(7),
@@ -177,9 +178,9 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
     return Container(
-      color: AppColors.lightRed.withValues(alpha: 0.6),
+      color: context.colors.lightRed,
       child: Center(
         child: Icon(
           product.icon ?? Icons.category_outlined,

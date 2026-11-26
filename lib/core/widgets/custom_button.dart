@@ -84,7 +84,7 @@ class CustomButton extends StatelessWidget {
         button = ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.lightRed,
+            backgroundColor: context.colors.lightRed,
             foregroundColor: AppColors.primaryRed,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 6),

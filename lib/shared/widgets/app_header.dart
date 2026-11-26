@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../app/theme/app_colors.dart';
+import '../../app/theme/theme_toggle_button.dart';
 import '../../core/constants/app_constants.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
@@ -10,6 +11,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final List<Widget>? actions;
   final bool showLogo;
+  final bool showThemeToggle;
 
   const AppHeader({
     super.key,
@@ -19,6 +21,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.actions,
     this.showLogo = false,
+    this.showThemeToggle = true,
   });
 
   @override
@@ -26,9 +29,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     Widget? leadingWidget;
     double leadingWidth = 56;
 
+    final primaryTextColor = context.colors.primaryText;
+    final secondaryTextColor = context.colors.secondaryText;
+
     if (showBackButton) {
       leadingWidget = IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.primaryText),
+        icon: Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: primaryTextColor),
         onPressed: () {
           if (onBack != null) {
             onBack!();
@@ -44,7 +50,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       leadingWidget = Padding(
         padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
         child: Image.asset(
-          AppConstants.logoAsset,
+          context.isDarkMode ? AppConstants.logoDarkAsset : AppConstants.logoAsset,
           fit: BoxFit.contain,
           alignment: Alignment.centerLeft,
           filterQuality: FilterQuality.medium,
@@ -82,8 +88,17 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
+    final combinedActions = <Widget>[
+      ...?actions,
+      if (showThemeToggle)
+        const Padding(
+          padding: EdgeInsets.only(right: 6.0),
+          child: ThemeToggleButton(),
+        ),
+    ];
+
     return AppBar(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       elevation: 0,
       centerTitle: false,
       leading: leadingWidget,
@@ -96,28 +111,28 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primaryText,
+                    color: primaryTextColor,
                     letterSpacing: -0.2,
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.secondaryText,
+                      color: secondaryTextColor,
                     ),
                   ),
               ],
             ),
-      actions: actions,
-      bottom: const PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Divider(height: 1, color: AppColors.border),
+      actions: combinedActions,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Divider(height: 1, color: context.colors.border),
       ),
     );
   }

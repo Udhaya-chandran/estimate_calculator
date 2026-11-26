@@ -8,8 +8,8 @@ class QuickStatsCard extends StatelessWidget {
   final String value;
   final String subtitle;
   final IconData icon;
-  final Color iconColor;
-  final Color iconBackgroundColor;
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
 
   const QuickStatsCard({
     super.key,
@@ -17,12 +17,15 @@ class QuickStatsCard extends StatelessWidget {
     required this.value,
     required this.subtitle,
     required this.icon,
-    this.iconColor = AppColors.primaryRed,
-    this.iconBackgroundColor = AppColors.lightRed,
+    this.iconColor,
+    this.iconBackgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor ?? AppColors.primaryRed;
+    final effectiveIconBg = iconBackgroundColor ?? context.colors.lightRed;
+
     return CustomCard(
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -34,16 +37,20 @@ class QuickStatsCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: iconBackgroundColor,
+                  color: effectiveIconBg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: iconColor, size: 20),
+                child: Icon(icon, color: effectiveIconColor, size: 20),
               ),
               const Spacer(),
               Flexible(
                 child: Text(
                   title,
-                  style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: context.colors.secondaryText,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -53,12 +60,19 @@ class QuickStatsCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.w800, fontSize: 20),
+            style: AppTextStyles.titleLarge.copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 20,
+              color: context.colors.primaryText,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: AppTextStyles.bodySmall.copyWith(fontSize: 11),
+            style: TextStyle(
+              fontSize: 11,
+              color: context.colors.secondaryText,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

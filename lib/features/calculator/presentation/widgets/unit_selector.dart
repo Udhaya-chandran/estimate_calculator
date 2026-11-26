@@ -19,17 +19,17 @@ class LengthUnitDropdown extends StatelessWidget {
         value: selectedUnit,
         dropdownColor: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryRed, size: 18),
+        icon: Icon(Icons.arrow_drop_down, color: AppColors.of(context).secondaryText, size: 18),
         selectedItemBuilder: (BuildContext context) {
           return LengthUnit.values.map<Widget>((LengthUnit unit) {
             return Align(
               alignment: Alignment.centerRight,
               child: Text(
                 unit.symbol,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primaryRed,
+                  color: AppColors.of(context).primaryText,
                 ),
               ),
             );
@@ -64,19 +64,19 @@ class WeightUnitDropdown extends StatelessWidget {
     return DropdownButtonHideUnderline(
       child: DropdownButton<WeightUnit>(
         value: selectedUnit,
-        dropdownColor: AppColors.surface,
+        dropdownColor: AppColors.of(context).surface,
         borderRadius: BorderRadius.circular(10),
-        icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryRed, size: 18),
+        icon: Icon(Icons.arrow_drop_down, color: AppColors.of(context).secondaryText, size: 18),
         selectedItemBuilder: (BuildContext context) {
           return WeightUnit.values.map<Widget>((WeightUnit unit) {
             return Align(
               alignment: Alignment.centerRight,
               child: Text(
                 unit.symbol,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primaryRed,
+                  color: AppColors.of(context).primaryText,
                 ),
               ),
             );
